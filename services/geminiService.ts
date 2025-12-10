@@ -1,17 +1,64 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { GithubUser, CardData } from '../types';
 
-const getAi = () => {
-    const apiKey = process.env.API_KEY;
-    if (!apiKey) throw new Error("API Key not found");
-    return new GoogleGenAI({ apiKey });
+// Static constants defined outside function scope to prevent reallocation
+const ART_STYLES = [
+    "Cyberpunk 2077 aesthetic, neon-noir, high contrast, chromatic aberration",
+    "Ethereal High Fantasy, oil painting style, magical lighting, intricate details",
+    "Solarpunk, organic tech, bright and hopeful, nature merging with machine",
+    "Dark Synthwave, retro-futuristic, grid lines, purple and teal, VHS grain",
+    "Abstract Glitch Art, digital distortion, data moshing, avant-garde",
+    "Steampunk, brass gears, steam, victorian industrial, copper tones",
+    "Sci-fi Minimalism, clean lines, white and chrome, cinematic lighting",
+    "Digital Watercolor, soft edges, artistic, flowy, dreamlike",
+    "Gothic Horror Tech, dark, moody, red glowing eyes, biomechanical cables",
+    "Retro 80s Anime style, cel-shaded, vibrant colors, dramatic angles"
+];
+
+const ENVIRONMENTS = [
+    "surrounded by floating holographic code screens",
+    "inside a massive futuristic server room with infinite lights",
+    "standing on a digital mountain peak overlooking a city of data",
+    "in an ancient library where books are made of glowing circuit boards",
+    "floating in the void of cyberspace with binary rain falling",
+    "sitting on a throne made of motherboards and thick cables",
+    "in a high-tech laboratory with floating robot assistants",
+    "in a cosmic nebula formed by constellations of nodes and graphs"
+];
+
+const POWER_ELEMENTS = [
+    "wielding a glowing keyboard like a powerful weapon",
+    "controlling streams of binary code with their bare hands",
+    "with mechanical augmentations glowing with raw energy",
+    "surrounded by orbiting data crystals and floating runes",
+    "wearing a hoodie that obscures the face with shadow and scrolling code",
+    "with a digital aura manifesting as a spectral animal",
+    "typing rapidly on a holographic interface that surrounds them"
+];
+
+const getAi = (apiKey?: string) => {
+    const key = apiKey || process.env.API_KEY;
+    if (!key) throw new Error("API Key not found. Please add your Google API Key in settings.");
+    return new GoogleGenAI({ apiKey: key });
+};
+
+const extractImageFromResponse = (response: any): string | null => {
+    for (const candidate of response.candidates || []) {
+        for (const part of candidate.content?.parts || []) {
+            if (part.inlineData) {
+                return `data:image/png;base64,${part.inlineData.data}`;
+            }
+        }
+    }
+    return null;
 };
 
 export const generateCardStats = async (
   user: GithubUser,
-  repoSummary: { topLanguages: string[], totalStars: number, totalForks: number }
+  repoSummary: { topLanguages: string[], totalStars: number, totalForks: number },
+  apiKey?: string
 ): Promise<CardData> => {
-  const ai = getAi();
+  const ai = getAi(apiKey);
   
   const prompt = `
     Aja como um gerador de cartas para o jogo "Super Trunfo" edição Desenvolvedores.
@@ -96,48 +143,15 @@ export const generateCardStats = async (
 export const generateCharacterImage = async (
     imageData: { base64: string; mimeType: string } | null, 
     archetype: string, 
-    primaryLang: string
+    primaryLang: string,
+    apiKey?: string
 ): Promise<string> => {
-    const ai = getAi();
+    const ai = getAi(apiKey);
     
-    // Arrays for dynamic prompt generation to ensure variety
-    const artStyles = [
-        "Cyberpunk 2077 aesthetic, neon-noir, high contrast, chromatic aberration",
-        "Ethereal High Fantasy, oil painting style, magical lighting, intricate details",
-        "Solarpunk, organic tech, bright and hopeful, nature merging with machine",
-        "Dark Synthwave, retro-futuristic, grid lines, purple and teal, VHS grain",
-        "Abstract Glitch Art, digital distortion, data moshing, avant-garde",
-        "Steampunk, brass gears, steam, victorian industrial, copper tones",
-        "Sci-fi Minimalism, clean lines, white and chrome, cinematic lighting",
-        "Digital Watercolor, soft edges, artistic, flowy, dreamlike",
-        "Gothic Horror Tech, dark, moody, red glowing eyes, biomechanical cables",
-        "Retro 80s Anime style, cel-shaded, vibrant colors, dramatic angles"
-    ];
-
-    const environments = [
-        "surrounded by floating holographic code screens",
-        "inside a massive futuristic server room with infinite lights",
-        "standing on a digital mountain peak overlooking a city of data",
-        "in an ancient library where books are made of glowing circuit boards",
-        "floating in the void of cyberspace with binary rain falling",
-        "sitting on a throne made of motherboards and thick cables",
-        "in a high-tech laboratory with floating robot assistants",
-        "in a cosmic nebula formed by constellations of nodes and graphs"
-    ];
-
-    const powerElements = [
-        "wielding a glowing keyboard like a powerful weapon",
-        "controlling streams of binary code with their bare hands",
-        "with mechanical augmentations glowing with raw energy",
-        "surrounded by orbiting data crystals and floating runes",
-        "wearing a hoodie that obscures the face with shadow and scrolling code",
-        "with a digital aura manifesting as a spectral animal",
-        "typing rapidly on a holographic interface that surrounds them"
-    ];
-
-    const randomStyle = artStyles[Math.floor(Math.random() * artStyles.length)];
-    const randomEnv = environments[Math.floor(Math.random() * environments.length)];
-    const randomElement = powerElements[Math.floor(Math.random() * powerElements.length)];
+    // Select random elements from static arrays
+    const randomStyle = ART_STYLES[Math.floor(Math.random() * ART_STYLES.length)];
+    const randomEnv = ENVIRONMENTS[Math.floor(Math.random() * ENVIRONMENTS.length)];
+    const randomElement = POWER_ELEMENTS[Math.floor(Math.random() * POWER_ELEMENTS.length)];
 
     // Construct a rich, dynamic prompt
     const basePrompt = `
@@ -150,7 +164,6 @@ export const generateCharacterImage = async (
 
     try {
         // Attempt 1: Image-to-Image (Transformation)
-        // Only try if we have image data
         if (imageData) {
             console.log("Attempting Image-to-Image generation...");
             const prompt = `
@@ -159,33 +172,25 @@ export const generateCharacterImage = async (
                 ${basePrompt}
                 
                 Requirements:
-                - Keep the composition suitable for a trading card.
+                - Close-up or Medium-Close-up Portrait. The face must be clearly visible and the main focus.
+                - Subject should be centered.
                 - Make the character look epic, powerful, and heroic.
                 - High quality, highly detailed digital art.
                 - The face should be stylistically adapted to the art style but still hint at the original person if possible.
                 - Aspect Ratio: 1:1 Square.
+                - ABSOLUTELY NO TEXT, NO LETTERS, NO NUMBERS, NO UI, NO HUD. Just the artwork.
             `;
 
             const response = await ai.models.generateContent({
                 model: 'gemini-2.5-flash-image',
                 contents: {
                     parts: [
-                        {
-                            inlineData: {
-                                mimeType: imageData.mimeType,
-                                data: imageData.base64
-                            }
-                        },
-                        {
-                            text: prompt
-                        }
+                        { inlineData: { mimeType: imageData.mimeType, data: imageData.base64 } },
+                        { text: prompt }
                     ]
                 },
                 config: {
-                    imageConfig: {
-                        // imageSize is NOT supported by flash-image, only aspectRatio
-                        aspectRatio: "1:1"
-                    }
+                    imageConfig: { aspectRatio: "1:1" }
                 }
             });
 
@@ -199,7 +204,7 @@ export const generateCharacterImage = async (
 
     console.log("Attempting Text-to-Image generation...");
 
-    // Attempt 2: Text-to-Image (Fallback if no image or I2I failed)
+    // Attempt 2: Text-to-Image (Fallback)
     const fallbackPrompt = `
         Create a masterpiece trading card illustration of a "${archetype}".
         
@@ -208,20 +213,16 @@ export const generateCharacterImage = async (
         Description:
         An epic, powerful character representing a master of ${primaryLang}. 
         They should look like a ${archetype}. 
+        Composition: Close-up Portrait, Head and Shoulders, Face clearly focused.
         Dynamic pose, cinematic lighting, 8k resolution, trending on artstation.
         Aspect Ratio: 1:1 Square.
+        IMPORTANT: Do not generate any text, labels, numbers, or card stats in the image. Pure visual illustration only.
     `;
 
     const response = await ai.models.generateContent({
         model: 'gemini-2.5-flash-image',
-        contents: {
-            parts: [{ text: fallbackPrompt }]
-        },
-        config: {
-            imageConfig: {
-                aspectRatio: "1:1"
-            }
-        }
+        contents: { parts: [{ text: fallbackPrompt }] },
+        config: { imageConfig: { aspectRatio: "1:1" } }
     });
 
     const img = extractImageFromResponse(response);
@@ -229,15 +230,3 @@ export const generateCharacterImage = async (
     
     throw new Error("No image generated from either method");
 };
-
-const extractImageFromResponse = (response: any): string | null => {
-    // Check for inline data in candidates
-    for (const candidate of response.candidates || []) {
-        for (const part of candidate.content?.parts || []) {
-            if (part.inlineData) {
-                return `data:image/png;base64,${part.inlineData.data}`;
-            }
-        }
-    }
-    return null;
-}

@@ -1,11 +1,10 @@
-import React, { useState } from 'react';
+import React, { useCallback } from 'react';
 import { InputForm } from './components/InputForm';
 import { Card } from './components/Card';
 import { CombinedProfile } from './types';
-import { fetchGithubUser, fetchGithubRepos, summarizeRepoData, fetchImageAsBase64 } from './services/githubService';
-import { generateCardStats, generateCharacterImage } from './services/geminiService';
 import { RefreshCcw, Download, Sparkles } from 'lucide-react';
-import { renderCardToCanvas } from './utils/cardRenderer';
+import { toPng } from 'html-to-image';
+import { useCardGenerator } from './hooks/useCardGenerator';
 
 const MOCK_PROFILE: CombinedProfile = {
   user: {
@@ -35,73 +34,33 @@ const MOCK_PROFILE: CombinedProfile = {
     },
     superTrunfoAttribute: "Estrelas"
   },
-  aiImageUrl: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=1000&auto=format&fit=crop" // Tech/Retro placeholder
+  aiImageUrl: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=1000&auto=format&fit=crop"
 };
 
 const App: React.FC = () => {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [profile, setProfile] = useState<CombinedProfile | null>(null);
+  const { loading, error, profile, generateCard, setMockProfile, resetProfile } = useCardGenerator();
 
-  const handleGenerate = async (username: string) => {
-    setLoading(true);
-    setError(null);
-    setProfile(null);
-
-    try {
-      // 1. Fetch GitHub Data
-      const user = await fetchGithubUser(username);
-      const repos = await fetchGithubRepos(username);
-      const repoSummary = summarizeRepoData(repos);
-
-      // 2. Generate Stats via Gemini
-      const cardData = await generateCardStats(user, repoSummary);
-      
-      let aiImageUrl = undefined;
-      try {
-          // 3. Generate AI Image
-          const imageData = await fetchImageAsBase64(user.avatar_url);
-          aiImageUrl = await generateCharacterImage(imageData, cardData.archetype, repoSummary.topLanguages[0] || 'Code');
-      } catch (e) {
-          console.warn("Failed to fetch/generate image, trying generation without source image...", e);
-          try {
-             // Fallback to text-only generation if fetching avatar failed entirely
-             aiImageUrl = await generateCharacterImage(null, cardData.archetype, repoSummary.topLanguages[0] || 'Code');
-          } catch (innerE) {
-             console.warn("AI Image generation completely failed", innerE);
-          }
-      }
-
-      setProfile({ user, cardData, aiImageUrl });
-
-    } catch (err: any) {
-      setError(err.message || 'Something went wrong. Please check the username or API key.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleMock = () => {
-      setLoading(true);
-      setError(null);
-      // Simulate network delay
-      setTimeout(() => {
-          setProfile(MOCK_PROFILE);
-          setLoading(false);
-      }, 1500);
-  };
+  const handleMock = useCallback(() => {
+      setMockProfile(MOCK_PROFILE);
+  }, [setMockProfile]);
 
   const downloadCard = async () => {
-    if (!profile) return;
+    const node = document.getElementById('dev-trunfo-card');
+    if (!node) return;
+
     try {
-        const dataUrl = await renderCardToCanvas(profile);
+        const dataUrl = await toPng(node, {
+            quality: 1.0,
+            pixelRatio: 3,
+            cacheBust: true,
+        });
         const link = document.createElement('a');
-        link.download = `dev-trunfo-${profile.user.login}.png`;
+        link.download = `dev-trunfo-${profile?.user.login || 'card'}.png`;
         link.href = dataUrl;
         link.click();
     } catch (err) {
-        console.error("Export failed", err);
-        alert("Failed to export image.");
+        console.error('Download failed', err);
+        alert('Failed to download image. Try again.');
     }
   };
 
@@ -119,14 +78,15 @@ const App: React.FC = () => {
         {/* Input Section - Hide when result is shown */}
         {!profile && (
             <div className={`transition-all duration-500 ease-in-out w-full flex justify-center`}>
-                <InputForm onSubmit={handleGenerate} onMock={handleMock} isLoading={loading} />
+                <InputForm onSubmit={generateCard} onMock={handleMock} isLoading={loading} />
             </div>
         )}
 
         {/* Error Message */}
         {error && (
-            <div className="bg-red-900/50 border border-red-500 text-red-200 px-6 py-4 rounded-lg animate-fade-in shadow-lg">
-                ⚠️ {error}
+            <div className="bg-red-900/50 border border-red-500 text-red-200 px-6 py-4 rounded-lg animate-fade-in shadow-lg text-center max-w-md">
+                <p className="font-bold mb-1">⚠️ Error</p>
+                <p className="text-sm">{error}</p>
             </div>
         )}
 
@@ -160,7 +120,7 @@ const App: React.FC = () => {
                     </button>
                     
                     <button 
-                        onClick={() => setProfile(null)}
+                        onClick={resetProfile}
                         className="flex items-center justify-center gap-2 bg-zinc-800 text-zinc-300 font-bold py-3 px-8 rounded-full hover:bg-zinc-700 transition-colors border border-zinc-700"
                     >
                         <RefreshCcw size={20} /> Create New

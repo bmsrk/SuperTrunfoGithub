@@ -2,15 +2,23 @@ import { GithubUser, GithubRepo } from '../types';
 
 const BASE_URL = 'https://api.github.com';
 
-export const fetchGithubUser = async (username: string): Promise<GithubUser> => {
+const getHeaders = (token?: string) => {
+    const headers: HeadersInit = {
+        'Accept': 'application/vnd.github.v3+json'
+    };
+    if (token) {
+        headers['Authorization'] = `token ${token}`;
+    }
+    return headers;
+};
+
+export const fetchGithubUser = async (username: string, token?: string): Promise<GithubUser> => {
   const cleanUsername = username.trim();
   if (!cleanUsername) throw new Error('Username is required');
 
   try {
     const response = await fetch(`${BASE_URL}/users/${cleanUsername}`, {
-      headers: {
-        'Accept': 'application/vnd.github.v3+json'
-      }
+      headers: getHeaders(token)
     });
 
     if (!response.ok) {
@@ -18,7 +26,7 @@ export const fetchGithubUser = async (username: string): Promise<GithubUser> => 
         throw new Error(`User "${cleanUsername}" not found on GitHub.`);
       }
       if (response.status === 403) {
-        throw new Error('GitHub API rate limit exceeded. Please try again later.');
+        throw new Error('GitHub API rate limit exceeded. Add a Token to increase limits.');
       }
       throw new Error(`GitHub API Error: ${response.status} ${response.statusText}`);
     }
@@ -29,14 +37,10 @@ export const fetchGithubUser = async (username: string): Promise<GithubUser> => 
   }
 };
 
-export const fetchGithubRepos = async (username: string): Promise<GithubRepo[]> => {
+export const fetchGithubRepos = async (username: string, token?: string): Promise<GithubRepo[]> => {
   try {
-    // We try to fetch repos, but if it fails (rate limit or network), 
-    // we return an empty array so the app can still generate a card based on the profile.
     const response = await fetch(`${BASE_URL}/users/${username}/repos?sort=updated&per_page=30`, {
-        headers: {
-            'Accept': 'application/vnd.github.v3+json'
-        }
+        headers: getHeaders(token)
     });
     
     if (!response.ok) {
