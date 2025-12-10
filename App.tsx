@@ -7,6 +7,37 @@ import { generateCardStats, generateCharacterImage } from './services/geminiServ
 import { RefreshCcw, Download, Sparkles } from 'lucide-react';
 import { renderCardToCanvas } from './utils/cardRenderer';
 
+const MOCK_PROFILE: CombinedProfile = {
+  user: {
+    login: "mock-dev",
+    name: "Testor the Great",
+    avatar_url: "https://avatars.githubusercontent.com/u/9919?v=4",
+    bio: "I exist solely to test this application.",
+    public_repos: 1337,
+    followers: 420,
+    following: 0,
+    created_at: "2010-01-01T00:00:00Z",
+    html_url: "https://github.com",
+  },
+  cardData: {
+    id: "DEV-00",
+    archetype: "System Architect",
+    description: "Compiles code with a stare.",
+    stats: [
+        { label: "Repositórios", value: 1337 },
+        { label: "Estrelas", value: 9001 },
+        { label: "Seguidores", value: 420 },
+        { label: "Commits", value: 50000, unit: "+" }
+    ],
+    specialAbility: {
+        name: "Hotfix Instantâneo",
+        description: "Corrige qualquer bug em produção antes que o cliente perceba. Ganha o turno automaticamente se o atributo for Commits."
+    },
+    superTrunfoAttribute: "Estrelas"
+  },
+  aiImageUrl: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=1000&auto=format&fit=crop" // Tech/Retro placeholder
+};
+
 const App: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -50,6 +81,16 @@ const App: React.FC = () => {
     }
   };
 
+  const handleMock = () => {
+      setLoading(true);
+      setError(null);
+      // Simulate network delay
+      setTimeout(() => {
+          setProfile(MOCK_PROFILE);
+          setLoading(false);
+      }, 1500);
+  };
+
   const downloadCard = async () => {
     if (!profile) return;
     try {
@@ -78,7 +119,7 @@ const App: React.FC = () => {
         {/* Input Section - Hide when result is shown */}
         {!profile && (
             <div className={`transition-all duration-500 ease-in-out w-full flex justify-center`}>
-                <InputForm onSubmit={handleGenerate} isLoading={loading} />
+                <InputForm onSubmit={handleGenerate} onMock={handleMock} isLoading={loading} />
             </div>
         )}
 

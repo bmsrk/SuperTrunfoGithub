@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
-import { Search, Github, Loader2 } from 'lucide-react';
+import { Search, Github, Loader2, FlaskConical } from 'lucide-react';
 
 interface InputFormProps {
-  onSubmit: (player1: string) => void;
+  onSubmit: (username: string) => void;
+  onMock: () => void;
   isLoading: boolean;
 }
 
-export const InputForm: React.FC<InputFormProps> = ({ onSubmit, isLoading }) => {
+export const InputForm: React.FC<InputFormProps> = ({ onSubmit, onMock, isLoading }) => {
   const [username, setUsername] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -54,6 +55,15 @@ export const InputForm: React.FC<InputFormProps> = ({ onSubmit, isLoading }) => 
           `}
         >
           {isLoading ? <Loader2 className="animate-spin" /> : <><Search size={18}/> GENERATE CARD</>}
+        </button>
+
+        <button
+          type="button"
+          onClick={onMock}
+          disabled={isLoading}
+          className="w-full text-zinc-500 text-xs hover:text-white transition-colors flex items-center justify-center gap-1 py-2 mt-1"
+        >
+            <FlaskConical size={12} /> Test with Mock Data
         </button>
       </form>
     </div>
