@@ -9,8 +9,7 @@ export default defineConfig(({ mode }) => {
 
   return {
     plugins: [react()],
-    // IMPORTANT: Change 'dev-trunfo' to your actual repository name on GitHub
-    base: '/dev-trunfo/', 
+    base: '/SuperTrunfoGithub/', 
     define: {
       // This injects the process.env.API_KEY into the build
       'process.env.API_KEY': JSON.stringify(env.API_KEY),
