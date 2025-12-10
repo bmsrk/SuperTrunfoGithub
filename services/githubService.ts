@@ -1,0 +1,117 @@
+import { GithubUser, GithubRepo } from '../types';
+
+const BASE_URL = 'https://api.github.com';
+
+export const fetchGithubUser = async (username: string): Promise<GithubUser> => {
+  const cleanUsername = username.trim();
+  if (!cleanUsername) throw new Error('Username is required');
+
+  try {
+    const response = await fetch(`${BASE_URL}/users/${cleanUsername}`, {
+      headers: {
+        'Accept': 'application/vnd.github.v3+json'
+      }
+    });
+
+    if (!response.ok) {
+      if (response.status === 404) {
+        throw new Error(`User "${cleanUsername}" not found on GitHub.`);
+      }
+      if (response.status === 403) {
+        throw new Error('GitHub API rate limit exceeded. Please try again later.');
+      }
+      throw new Error(`GitHub API Error: ${response.status} ${response.statusText}`);
+    }
+
+    return response.json();
+  } catch (error: any) {
+    throw new Error(error.message || 'Network error while fetching GitHub user.');
+  }
+};
+
+export const fetchGithubRepos = async (username: string): Promise<GithubRepo[]> => {
+  try {
+    // We try to fetch repos, but if it fails (rate limit or network), 
+    // we return an empty array so the app can still generate a card based on the profile.
+    const response = await fetch(`${BASE_URL}/users/${username}/repos?sort=updated&per_page=30`, {
+        headers: {
+            'Accept': 'application/vnd.github.v3+json'
+        }
+    });
+    
+    if (!response.ok) {
+      console.warn(`Failed to fetch repos for ${username}: ${response.status}`);
+      return [];
+    }
+    
+    return response.json();
+  } catch (error) {
+    console.warn("Network error fetching repos, proceeding with empty list.", error);
+    return [];
+  }
+};
+
+export const summarizeRepoData = (repos: GithubRepo[]) => {
+  const languages: Record<string, number> = {};
+  let totalStars = 0;
+  let totalForks = 0;
+
+  if (!repos || !Array.isArray(repos)) {
+      return { topLanguages: [], totalStars: 0, totalForks: 0, repoCount: 0 };
+  }
+
+  repos.forEach(repo => {
+    if (repo.language) {
+      languages[repo.language] = (languages[repo.language] || 0) + 1;
+    }
+    totalStars += repo.stargazers_count;
+    totalForks += repo.forks_count;
+  });
+
+  const topLanguages = Object.entries(languages)
+    .sort(([, a], [, b]) => b - a)
+    .slice(0, 3)
+    .map(([lang]) => lang);
+
+  return {
+    topLanguages,
+    totalStars,
+    totalForks,
+    repoCount: repos.length // of the sample
+  };
+};
+
+export const fetchImageAsBase64 = async (url: string): Promise<{ base64: string; mimeType: string }> => {
+  if (!url) throw new Error("No image URL provided");
+
+  try {
+    // Append size param to get a decent resolution but not huge
+    const urlObj = new URL(url);
+    urlObj.searchParams.set('s', '512');
+    
+    const response = await fetch(urlObj.toString());
+    if (!response.ok) throw new Error("Failed to load image from GitHub");
+    
+    const blob = await response.blob();
+    const mimeType = blob.type || 'image/jpeg';
+    
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64String = reader.result as string;
+        if (!base64String) {
+            reject(new Error("Empty result from FileReader"));
+            return;
+        }
+        // Remove the data URL prefix (e.g., "data:image/jpeg;base64,")
+        const base64Data = base64String.split(',')[1];
+        resolve({ base64: base64Data, mimeType });
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  } catch (error) {
+    console.error("Error converting image to base64", error);
+    throw new Error("Failed to process profile image");
+  }
+};
