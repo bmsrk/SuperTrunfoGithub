@@ -123,32 +123,198 @@ export const generateLocalCardStats = (
   const isProlific = user.public_repos > 30;
   const isPopular = user.followers > 100;
   
-  // Language-based archetype base
+  // Language-based archetype base - 3x Expanded with even more creative variations
   const langArchetypes: Record<string, string[]> = {
-    'JavaScript': ['Frontend Alchemist', 'Script Sorcerer', 'Web Enchanter'],
-    'TypeScript': ['Type-Safe Paladin', 'Interface Guardian', 'Typed Warrior'],
-    'Python': ['Data Sorcerer', 'Script Wizard', 'Algorithm Sage'],
-    'Java': ['Enterprise Architect', 'JVM Titan', 'Bean Master'],
-    'Go': ['Concurrency Master', 'Goroutine Shepherd', 'Cloud Native'],
-    'Rust': ['Memory Guardian', 'Safe Code Sentinel', 'Systems Artisan'],
-    'C++': ['Performance Ninja', 'Low-Level Samurai', 'Cache Optimizer'],
-    'C#': ['Framework Wizard', 'LINQ Sorcerer', '.NET Architect'],
-    'Ruby': ['Rails Conductor', 'Gem Curator', 'Meta-Programming Mage'],
-    'PHP': ['Web Craftsman', 'Server-Side Sage', 'Dynamic Weaver'],
-    'Swift': ['iOS Architect', 'SwiftUI Master', 'Apple Ecosystem Lord'],
-    'Kotlin': ['Android Artisan', 'Coroutine Commander', 'JetBrains Virtuoso'],
-    'Dart': ['Flutter Champion', 'Widget Wizard', 'Cross-Platform Sage'],
-    'R': ['Statistical Sage', 'Data Visualizer', 'Research Wizard'],
-    'Shell': ['Terminal Virtuoso', 'Script Automator', 'CLI Champion']
+    'JavaScript': [
+      'Async Sorcerer', 'Promise Whisperer', 'Event Loop Maestro', 
+      'Callback Conjurer', 'DOM Manipulator Supreme', 'ES6 Archmage', 
+      'Node.js Necromancer', 'Closure Craftsman', 'Prototype Prophet',
+      'Module Bundler Maven', 'JSON Juggler', 'Webpack Wizard',
+      'React Router Ranger', 'Babel Bard', 'npm Nomad',
+      'Express.js Engineer', 'V8 Virtuoso', 'Middleware Mystic',
+      'Hoisting Handler', 'Scope Chain Shaman', 'This Binding Titan'
+    ],
+    'TypeScript': [
+      'Type Enforcer', 'Generic Overlord', 'Interface Sculptor', 
+      'Compiler Tamer', 'Strict Mode Champion', 'Decorator Virtuoso',
+      'Angular Guardian', 'Union Type Unifier', 'Namespace Navigator',
+      'Type Guard Gladiator', 'Enum Enchanter', 'Tuple Tactician',
+      'Conditional Type Conjurer', 'Mapped Type Master', 'Utility Type Utilizer',
+      'Type Inference Invoker', 'Readonly Ruler', 'Const Assertion Champion',
+      'Literal Type Lord', 'Template Literal Luminary', 'Type Predicate Paladin'
+    ],
+    'Python': [
+      'Pythonic Sage', 'List Comprehension Master', 'Pandas Wrangler', 
+      'Decorator Enchanter', 'Django Dynamo', 'Flask Alchemist', 
+      'Data Pipeline Architect', 'Snake Charmer', 'Generator Guardian',
+      'Lambda Luminary', 'Context Manager Commander', 'Metaclass Mystic',
+      'NumPy Ninja', 'Scikit-Learn Sensei', 'TensorFlow Titan',
+      'AsyncIO Adept', 'Type Hint Herald', 'Pytest Prophet',
+      'Virtual Environment Virtuoso', 'pip Package Practitioner', 'PEP Perfectionist'
+    ],
+    'Java': [
+      'Spring Framework Oracle', 'Thread Pool Tactician', 'Maven Magister', 
+      'Garbage Collection Guru', 'Exception Handler Extraordinaire', 
+      'Annotation Architect', 'Bytecode Blacksmith', 'JVM Jedi',
+      'Hibernate Harbinger', 'Stream API Sorcerer', 'Lambda Lord',
+      'Optional Optimizer', 'Reflection Ranger', 'Serialization Sentinel',
+      'Concurrency Connoisseur', 'Design Pattern Devotee', 'JDBC Journeyman',
+      'Gradle Grandmaster', 'Microservice Monarch', 'Spring Boot Baron',
+      'Dependency Injection Diplomat'
+    ],
+    'Go': [
+      'Channel Conductor', 'Goroutine Grandmaster', 'Concurrency Crusader', 
+      'Interface Implementor', 'Gopher Commander', 'Microservice Maverick',
+      'Error Handler Elite', 'Defer Defender', 'Panic Recovery Ranger',
+      'Go Modules Manager', 'Context Conjurer', 'Slice Surgeon',
+      'Map Manipulator', 'Struct Sculptor', 'Method Maestro',
+      'Package Practitioner', 'Testing Table Titan', 'Benchmark Baron',
+      'HTTP Handler Hero', 'JSON Marshal Master', 'Buffer Builder Bard'
+    ],
+    'Rust': [
+      'Borrow Checker Whisperer', 'Memory Safety Sentinel', 'Lifetime Legend', 
+      'Ownership Oracle', 'Zero-Cost Zealot', 'Cargo Cultist',
+      'Systems Programming Samurai', 'Trait Implementor Titan', 'Macro Magician',
+      'Result Type Ranger', 'Option Handler Oracle', 'Pattern Matching Paladin',
+      'Smart Pointer Sage', 'Unsafe Code Sentinel', 'Iterator Invoker',
+      'Async Runtime Ruler', 'Fearless Concurrency Champion', 'Move Semantics Master',
+      'Type State Tactician', 'Phantom Type Philosopher', 'Compiler Error Conqueror'
+    ],
+    'C++': [
+      'Template Metaprogrammer', 'RAII Ranger', 'STL Sorcerer', 
+      'Pointer Paladin', 'Virtual Function Virtuoso', 'Performance Perfectionist',
+      'Cache-Friendly Craftsman', 'Move Semantics Master', 'Smart Pointer Sage',
+      'Exception Safety Expert', 'Undefined Behavior Banisher', 'Memory Leak Hunter',
+      'Lambda Luminary', 'Constexpr Conjurer', 'Compile Time Champion',
+      'Template Specialization Specialist', 'SFINAE Sorcerer', 'C++20 Concepts Connoisseur',
+      'Operator Overload Overlord', 'Copy Elision Expert', 'Inline Assembly Artisan'
+    ],
+    'C#': [
+      'LINQ Luminary', 'Async/Await Adept', 'Entity Framework Enchanter', 
+      'Blazor Battlemage', '.NET Core Commander', 'Delegate Diplomat',
+      'Task Parallel Titan', 'Extension Method Expert', 'Nullable Reference Navigator',
+      'Pattern Matching Prodigy', 'Record Type Ruler', 'Init-Only Innovator',
+      'Top-Level Statement Sage', 'Target-Typed New Navigator', 'Span<T> Specialist',
+      'Memory<T> Master', 'IAsyncEnumerable Implementor', 'C# 12 Champion',
+      'Primary Constructor Practitioner', 'Collection Expressions Expert', 'Lambda Improvements Lord'
+    ],
+    'Ruby': [
+      'Rails Ranger', 'Metaprogramming Mystic', 'Block Bender', 
+      'Gem Guardian', 'DSL Designer', 'Rake Master',
+      'Convention Over Configuration Crusader', 'ActiveRecord Architect', 'RSpec Ruler',
+      'Symbol Sage', 'Proc Prophet', 'Mixin Maestro',
+      'Method Missing Maven', 'Monkey Patching Paladin', 'Enumerable Expert',
+      'Singleton Sorcerer', 'Class Variable Champion', 'Fiber Facilitator',
+      'ERB Template Titan', 'Bundler Baron', 'Ruby Version Manager Virtuoso'
+    ],
+    'PHP': [
+      'Laravel Legend', 'Composer Conductor', 'Symfony Sorcerer', 
+      'WordPress Wizard', 'Array Artisan', 'Namespace Navigator',
+      'PDO Practitioner', 'Eloquent ORM Oracle', 'Blade Template Bard',
+      'PHP 8 Pioneer', 'Type Declaration Tactician', 'Union Type Unifier',
+      'Named Arguments Navigator', 'Attribute Architect', 'Constructor Property Promoter',
+      'Match Expression Master', 'Nullsafe Operator Ninja', 'Fibers Facilitator',
+      'Trait Tactician', 'PSR Standard Sentinel', 'Dependency Injection Diplomat'
+    ],
+    'Swift': [
+      'SwiftUI Sculptor', 'Protocol-Oriented Prodigy', 'Combine Champion', 
+      'Optional Unwrapper', 'CoreData Custodian', 'iOS Innovator',
+      'Property Wrapper Wizard', 'Result Builder Ranger', 'Async/Await Architect',
+      'Actor Artisan', 'Sendable Sentinel', 'MainActor Master',
+      'Codable Conjurer', 'KeyPath Keeper', 'Type Erasure Expert',
+      'Opaque Type Oracle', 'ARC Memory Manager', 'Closure Capture Champion',
+      'Value Semantics Virtuoso', 'Copy-on-Write Craftsman', 'Swift Concurrency Commander'
+    ],
+    'Kotlin': [
+      'Coroutine Conjurer', 'Extension Function Expert', 'Sealed Class Specialist', 
+      'Data Class Dynamo', 'Jetpack Compose Composer', 'Android Authority',
+      'Null-Safety Knight', 'Scope Function Sage', 'Delegation Diplomat',
+      'Inline Function Innovator', 'Reified Type Ruler', 'DSL Designer',
+      'Flow Facilitator', 'Channel Champion', 'Multiplatform Maven',
+      'Context Receiver Ranger', 'Value Class Virtuoso', 'Contracts Champion',
+      'Smart Cast Sorcerer', 'When Expression Wizard', 'Destructuring Declaration Devotee'
+    ],
+    'Dart': [
+      'Flutter Phenomenon', 'Widget Tree Weaver', 'State Manager Sage', 
+      'Async Stream Sorcerer', 'Hot Reload Hero', 'Material Design Maestro',
+      'Riverpod Ruler', 'BLoC Pattern Baron', 'Provider Prophet',
+      'GetX Grandmaster', 'Navigator 2.0 Navigator', 'Null Safety Ninja',
+      'Extension Method Expert', 'Mixin Master', 'Late Initialization Lord',
+      'Required Modifier Ranger', 'Sound Type System Sentinel', 'Isolate Implementor',
+      'Platform Channel Champion', 'Custom Paint Craftsman', 'Animation Architect'
+    ],
+    'R': [
+      'ggplot2 Grandmaster', 'Statistical Storyteller', 'Tidyverse Titan', 
+      'Data Frame Wizard', 'Shiny App Architect', 'R Markdown Maestro',
+      'Machine Learning Mystic', 'dplyr Data Diplomat', 'tidyr Tactician',
+      'purrr Practitioner', 'readr Reader', 'tibble Tamer',
+      'stringr String Surgeon', 'forcats Factor Facilitator', 'lubridate Time Lord',
+      'caret Classification Champion', 'randomForest Ranger', 'glmnet Guardian',
+      'ggplot2 Geom Genius', 'RStudio Ruler', 'Package Development Prophet'
+    ],
+    'Shell': [
+      'Bash Script Barbarian', 'Pipe Dream Architect', 'Sed & Awk Sorcerer', 
+      'Cron Job Craftsman', 'Environment Variable Virtuoso', 'One-Liner Legend',
+      'Terminal Tamer', 'Regex Ranger', 'Grep Guardian',
+      'Find File Facilitator', 'SSH Sentinel', 'Process Control Paladin',
+      'Shell Expansion Expert', 'Background Job Baron', 'Signal Handler Hero',
+      'Shell Function Sage', 'Parameter Expansion Prophet', 'Subshell Specialist',
+      'Redirection Ruler', 'Exit Status Examiner', 'Script Debugging Detective'
+    ],
+    'C': [
+      'Malloc Master', 'Segfault Survivor', 'Pointer Arithmetician',
+      'System Call Summoner', 'Low-Level Legend', 'Header File Harmonizer',
+      'Bit Manipulation Bard', 'Memory Management Maestro', 'Buffer Overflow Banisher',
+      'Undefined Behavior Detector', 'Volatile Variable Virtuoso', 'Preprocessor Prophet',
+      'Struct Packing Specialist', 'Union Utilizer', 'Function Pointer Facilitator',
+      'Static Analyzer Sage', 'Inline Assembly Artist', 'Memory-Mapped I/O Master',
+      'Linkage Lord', 'Translation Unit Tactician', 'Standards Compliance Champion'
+    ],
+    'Scala': [
+      'Functional Programming Philosopher', 'Akka Actor Adept', 'Pattern Matching Prodigy',
+      'Immutability Idealist', 'Higher-Order Hero', 'Spark Stream Sage',
+      'Type Inference Titan', 'Implicit Implementor', 'Type Class Tactician',
+      'For-Comprehension Facilitator', 'Case Class Champion', 'Sealed Trait Specialist',
+      'Monadic Maestro', 'Future Facilitator', 'Cats Effect Expert',
+      'ZIO Zealot', 'Shapeless Shaman', 'Macro Master',
+      'Type-Level Programming Prophet', 'Context Bounds Bard', 'Variance Virtuoso'
+    ],
+    'Elixir': [
+      'OTP Overlord', 'Process Tree Practitioner', 'Phoenix Framework Phoenix',
+      'Pattern Matching Poet', 'Fault-Tolerance Fanatic', 'Ecto Enchanter',
+      'Erlang VM Virtuoso', 'GenServer Guardian', 'Supervisor Strategy Sage',
+      'Pipe Operator Prophet', 'Macro Metaprogrammer', 'Protocol Practitioner',
+      'LiveView Luminary', 'PubSub Paladin', 'Task Async Tactician',
+      'Stream Sorcerer', 'Mix Tool Master', 'Behaviour Baron',
+      'Let It Crash Lord', 'Hot Code Reload Hero', 'Distributed Systems Diplomat'
+    ],
+    'Haskell': [
+      'Monad Mystic', 'Pure Function Fanatic', 'Lazy Evaluation Legend',
+      'Type Class Tactician', 'Functor Philosopher', 'Category Theory Champion',
+      'Immutability Immortal', 'Applicative Architect', 'Monad Transformer Master',
+      'Lens Library Luminary', 'Parser Combinator Prophet', 'GADTs Guardian',
+      'Type Family Facilitator', 'Existential Type Expert', 'Phantom Type Practitioner',
+      'Free Monad Fanatic', 'Effect System Sage', 'Recursion Scheme Ruler',
+      'Continuation Passing Craftsman', 'Church Encoding Champion', 'Lambda Calculus Lord'
+    ]
   };
   
-  const archetypeOptions = langArchetypes[topLang] || [`${topLang} Developer`, `${topLang} Expert`, `${topLang} Master`];
+  const archetypeOptions = langArchetypes[topLang] || [
+    'Code Craftsman', 'Digital Architect', 'Syntax Sorcerer',
+    'Framework Fanatic', 'Pattern Practitioner', 'Full-Stack Virtuoso',
+    'Polyglot Developer'
+  ];
   
-  // Weight archetypes based on user profile
-  let weights = [1, 1, 1];
-  if (isProlific) weights[0] *= 1.5;
-  if (isPopular) weights[1] *= 1.5;
-  if (hasCompany || hasLocation) weights[2] *= 1.5;
+  // Weight archetypes based on user profile - more nuanced weighting
+  const weights = archetypeOptions.map(() => 1);
+  
+  // Boost weights based on profile characteristics
+  if (isProlific && weights.length > 0) weights[0] *= 2.0;
+  if (isPopular && weights.length > 1) weights[1] *= 2.0;
+  if (hasCompany && weights.length > 2) weights[2] *= 1.8;
+  if (hasLocation && weights.length > 3) weights[3] *= 1.6;
+  if (accountAge > 5 && weights.length > 4) weights[4] *= 1.5;
+  if (repoSummary.allTopics.length > 5 && weights.length > 5) weights[5] *= 1.4;
   
   const archetype = weightedChoice(archetypeOptions, weights, rng);
   
@@ -184,55 +350,197 @@ export const generateLocalCardStats = (
     ? descriptionParts.slice(0, 3).join('. ') + '.'
     : `Desenvolvedor ${topLang} com ${accountAge} anos de experiência no GitHub.`;
   
-  // Special ability based on profile and highest stat
+  // Special ability based on profile and highest stat - Enhanced with more creative options
   const abilityOptions: Array<{name: string, description: string, weight: number}> = [];
   
-  if (topLang === 'Python' || repoSummary.allTopics.some(t => t.includes('machine-learning') || t.includes('data'))) {
-    abilityOptions.push({
-      name: 'Neural Net Deploy',
-      description: `Multiplica Commits por ${Math.ceil(rng() * 2 + 1)} se for o trunfo.`,
-      weight: 2
-    });
+  // Python/Data Science specific abilities
+  if (topLang === 'Python' || repoSummary.allTopics.some(t => t.includes('machine-learning') || t.includes('data') || t.includes('ai'))) {
+    abilityOptions.push(
+      {
+        name: 'Neural Net Deploy',
+        description: `Multiplica Commits por ${Math.ceil(rng() * 2 + 1)} se for o trunfo.`,
+        weight: 2
+      },
+      {
+        name: 'DataFrame Overflow',
+        description: 'Adiciona metade dos seus Commits ao valor de Estrelas.',
+        weight: 2
+      },
+      {
+        name: 'Tensor Flow Surge',
+        description: 'Se Commits for maior que 10000, ganha automaticamente.',
+        weight: 2
+      }
+    );
   }
   
-  if (topLang === 'JavaScript' || topLang === 'TypeScript' || repoSummary.allTopics.some(t => t.includes('react') || t.includes('frontend'))) {
-    abilityOptions.push({
-      name: 'Virtual DOM Storm',
-      description: `Adiciona ${Math.floor(rng() * 20 + 10)} pontos a Estrelas.`,
-      weight: 2
-    });
+  // JavaScript/TypeScript/Frontend specific abilities
+  if (topLang === 'JavaScript' || topLang === 'TypeScript' || repoSummary.allTopics.some(t => t.includes('react') || t.includes('frontend') || t.includes('vue') || t.includes('angular'))) {
+    abilityOptions.push(
+      {
+        name: 'Virtual DOM Storm',
+        description: `Adiciona ${Math.floor(rng() * 20 + 10)} pontos a Estrelas.`,
+        weight: 2
+      },
+      {
+        name: 'Async Cascade',
+        description: 'Converte 10% dos Commits em Seguidores adicionais.',
+        weight: 2
+      },
+      {
+        name: 'Component Render Burst',
+        description: 'Ignora o primeiro ataque do oponente se tiver mais Repositórios.',
+        weight: 2
+      }
+    );
   }
   
+  // Rust/Systems specific abilities
+  if (topLang === 'Rust' || topLang === 'C' || topLang === 'C++' || repoSummary.allTopics.some(t => t.includes('systems') || t.includes('embedded'))) {
+    abilityOptions.push(
+      {
+        name: 'Zero-Cost Abstraction',
+        description: 'Dobra Commits se for o trunfo e você tiver menos de 50 Repositórios.',
+        weight: 2
+      },
+      {
+        name: 'Memory Safety Shield',
+        description: 'Anula habilidades baseadas em Estrelas do oponente.',
+        weight: 2
+      },
+      {
+        name: 'Borrow Checker Barrier',
+        description: 'Protege seu atributo trunfo de ser anulado uma vez por jogo.',
+        weight: 2
+      }
+    );
+  }
+  
+  // Go/Cloud specific abilities
+  if (topLang === 'Go' || repoSummary.allTopics.some(t => t.includes('kubernetes') || t.includes('cloud') || t.includes('docker'))) {
+    abilityOptions.push(
+      {
+        name: 'Goroutine Swarm',
+        description: 'Multiplica Repositórios por 1.5 para este turno.',
+        weight: 2
+      },
+      {
+        name: 'Channel Buffer Burst',
+        description: 'Adiciona 25% dos seus Commits aos Seguidores.',
+        weight: 2
+      },
+      {
+        name: 'Concurrency Collapse',
+        description: 'Divide os Commits do oponente por 2 se você tiver mais Repositórios.',
+        weight: 2
+      }
+    );
+  }
+  
+  // Popular/High stars abilities
   if (repoSummary.totalStars > 500) {
-    abilityOptions.push({
-      name: 'Open Source Legend',
-      description: 'Dobra o valor de Estrelas se for o trunfo.',
-      weight: 3
-    });
+    abilityOptions.push(
+      {
+        name: 'Open Source Legend',
+        description: 'Dobra o valor de Estrelas se for o trunfo.',
+        weight: 3
+      },
+      {
+        name: 'Star Collector Supreme',
+        description: `Adiciona ${Math.floor(repoSummary.totalStars * 0.1)} pontos a todos os atributos.`,
+        weight: 3
+      }
+    );
   }
   
+  // High follower abilities
   if (user.followers > 200) {
-    abilityOptions.push({
-      name: 'Community Magnet',
-      description: 'Ganha automaticamente se Seguidores for maior que o oponente.',
-      weight: 3
-    });
+    abilityOptions.push(
+      {
+        name: 'Community Magnet',
+        description: 'Ganha automaticamente se Seguidores for maior que o oponente.',
+        weight: 3
+      },
+      {
+        name: 'Viral Code Wave',
+        description: 'Converte 20% das suas Estrelas em Seguidores extras.',
+        weight: 2
+      }
+    );
   }
   
+  // Company/Enterprise abilities
   if (hasCompany) {
-    abilityOptions.push({
-      name: 'Enterprise Power',
-      description: 'Anula habilidades especiais de oponentes com menos repositórios.',
-      weight: 2
-    });
+    abilityOptions.push(
+      {
+        name: 'Enterprise Power',
+        description: 'Anula habilidades especiais de oponentes com menos repositórios.',
+        weight: 2
+      },
+      {
+        name: 'Corporate Synergy',
+        description: 'Aumenta todos os atributos em 15% se tiver mais de 30 Repositórios.',
+        weight: 2
+      }
+    );
   }
   
-  // Default abilities
+  // Prolific developer abilities
+  if (isProlific) {
+    abilityOptions.push(
+      {
+        name: 'Repository Rain',
+        description: 'Adiciona o número de Repositórios a todos os outros atributos.',
+        weight: 2
+      },
+      {
+        name: 'Polyglot Mastery',
+        description: 'Ignora penalidades e anulações de habilidades especiais.',
+        weight: 2
+      }
+    );
+  }
+  
+  // Location-based special abilities
+  if (user.location) {
+    const loc = user.location.toLowerCase();
+    if (loc.includes('brazil') || loc.includes('brasil')) {
+      abilityOptions.push({
+        name: 'Jeitinho Brasileiro',
+        description: 'Encontra uma solução criativa: rouba metade das Estrelas do oponente.',
+        weight: 1.5
+      });
+    } else if (loc.includes('japan') || loc.includes('tokyo')) {
+      abilityOptions.push({
+        name: 'Bushido Code',
+        description: 'Honra no código: duplica Commits se você tiver menos Seguidores.',
+        weight: 1.5
+      });
+    } else if (loc.includes('india')) {
+      abilityOptions.push({
+        name: 'Jugaad Innovation',
+        description: 'Engenhosidade criativa: transforma 30% dos Repositórios em Estrelas.',
+        weight: 1.5
+      });
+    } else if (loc.includes('silicon valley') || loc.includes('san francisco')) {
+      abilityOptions.push({
+        name: 'Startup Hustle',
+        description: 'Move fast: adiciona 50% dos Seguidores aos Commits.',
+        weight: 1.5
+      });
+    }
+  }
+  
+  // Default/Universal abilities - More creative options
   abilityOptions.push(
-    { name: 'Git Push --force', description: 'Dobra o valor de Commits se for o trunfo.', weight: 1 },
-    { name: 'Merge Master', description: 'Ganha se tiver mais repositórios que o oponente.', weight: 1 },
-    { name: 'Code Review Pro', description: 'Anula o trunfo do oponente se tiver mais estrelas.', weight: 1 },
-    { name: 'Sudo Deploy', description: 'Troca valores de Seguidores com o oponente.', weight: 1 }
+    { name: 'Git Revert Reality', description: 'Anula a última jogada do oponente e volta ao estado anterior.', weight: 1 },
+    { name: 'Merge Conflict Master', description: 'Se empatar, você vence automaticamente.', weight: 1 },
+    { name: 'Code Review Devastation', description: 'Reduz todos os atributos do oponente em 10%.', weight: 1 },
+    { name: 'Refactor Revolution', description: 'Troca seu atributo mais fraco pelo mais forte do oponente.', weight: 1 },
+    { name: 'Stack Overflow Summon', description: 'Copia o atributo trunfo do oponente como um bonus.', weight: 1 },
+    { name: 'CI/CD Pipeline Breach', description: 'Todos os seus atributos são multiplicados por 1.3.', weight: 1 },
+    { name: 'Hotfix Teleport', description: 'Permite jogar duas vezes seguidas se vencer este turno.', weight: 1 },
+    { name: 'Debug Mode Infinity', description: 'Revela todos os atributos ocultos e adiciona 15% a todos.', weight: 1 }
   );
   
   const specialAbility = weightedChoice(
