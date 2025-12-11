@@ -162,6 +162,31 @@ This uses `gh-pages` package to build and push to the `gh-pages` branch.
    - Add as repository secret named `API_KEY` for the GitHub Actions workflow
    - Note: App works without this, but rate limits may be hit
 
+### Recent Improvements (Latest Update)
+
+#### Testing Infrastructure ✅
+1. **Unit Tests Added**:
+   - Comprehensive test suite with Vitest
+   - 45 unit tests covering services and utilities
+   - Tests for GitHub API integration (17 tests)
+   - Tests for AI prompt generation logic (20 tests)
+   - Tests for configuration utilities (8 tests)
+   - All tests passing with proper mocking and edge case coverage
+
+2. **Enhanced Documentation**:
+   - Detailed AI personalization section in README
+   - Comprehensive explanation of prompt engineering techniques
+   - Examples of how profiles influence card generation
+   - Testing instructions in deployment guide
+   - Clear test commands for unit and E2E tests
+
+3. **Test Coverage Areas**:
+   - Service layer functions (GitHub API, Gemini AI)
+   - Data transformation and summarization
+   - Error handling and edge cases
+   - API key management and configuration
+   - Prompt personalization logic validation
+
 ### Future Improvements
 
 #### High Priority
@@ -169,10 +194,10 @@ This uses `gh-pages` package to build and push to the `gh-pages` branch.
    - Consider updating to Vite 6+ when available
    - Monitor for esbuild security patches
 
-2. **Add Tests**:
-   - Unit tests for services and utilities
+2. **Additional Testing** (Optional):
    - Component tests for React components
-   - E2E tests for critical user flows
+   - Integration tests for full card generation flow
+   - Visual regression tests
 
 3. **Error Boundaries**:
    - Add React Error Boundaries for better error handling
