@@ -58,6 +58,51 @@ Then update the workflow file to pass the secret:
 
 ---
 
+## Running Tests Locally
+
+Before deploying, it's recommended to run tests locally to ensure everything works:
+
+### Unit Tests (Vitest)
+```bash
+# Run unit tests once
+npm test -- --run
+
+# Run unit tests in watch mode
+npm test
+
+# Run unit tests with UI
+npm run test:ui
+
+# Run with coverage report
+npm run test:coverage
+```
+
+### E2E Tests (Playwright)
+```bash
+# Install Playwright browsers (first time only)
+npx playwright install --with-deps chromium
+
+# Run E2E tests
+npm run test:e2e
+
+# Run tests in headed mode (see browser)
+npm run test:e2e:headed
+
+# Run tests in UI mode (interactive)
+npm run test:e2e:ui
+
+# View test report
+npm run test:e2e:report
+```
+
+### Run All Tests
+```bash
+# Run both unit and e2e tests
+npm run test:all
+```
+
+---
+
 ## Troubleshooting
 
 ### Site Not Loading (404 Error)
