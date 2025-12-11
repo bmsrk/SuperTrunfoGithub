@@ -90,7 +90,11 @@ describe('geminiService', () => {
       const validArchetypes = [
         'Async Sorcerer', 'Promise Whisperer', 'Event Loop Maestro', 
         'Callback Conjurer', 'DOM Manipulator Supreme', 'ES6 Archmage', 
-        'Node.js Necromancer'
+        'Node.js Necromancer', 'Closure Craftsman', 'Prototype Prophet',
+        'Module Bundler Maven', 'JSON Juggler', 'Webpack Wizard',
+        'React Router Ranger', 'Babel Bard', 'npm Nomad',
+        'Express.js Engineer', 'V8 Virtuoso', 'Middleware Mystic',
+        'Hoisting Handler', 'Scope Chain Shaman', 'This Binding Titan'
       ];
       expect(validArchetypes).toContain(result.archetype);
     });
@@ -101,7 +105,11 @@ describe('geminiService', () => {
       const validArchetypes = [
         'Type Enforcer', 'Generic Overlord', 'Interface Sculptor', 
         'Compiler Tamer', 'Strict Mode Champion', 'Decorator Virtuoso',
-        'Angular Guardian'
+        'Angular Guardian', 'Union Type Unifier', 'Namespace Navigator',
+        'Type Guard Gladiator', 'Enum Enchanter', 'Tuple Tactician',
+        'Conditional Type Conjurer', 'Mapped Type Master', 'Utility Type Utilizer',
+        'Type Inference Invoker', 'Readonly Ruler', 'Const Assertion Champion',
+        'Literal Type Lord', 'Template Literal Luminary', 'Type Predicate Paladin'
       ];
       expect(validArchetypes).toContain(result.archetype);
     });
@@ -112,7 +120,11 @@ describe('geminiService', () => {
       const validArchetypes = [
         'Pythonic Sage', 'List Comprehension Master', 'Pandas Wrangler', 
         'Decorator Enchanter', 'Django Dynamo', 'Flask Alchemist', 
-        'Data Pipeline Architect', 'Snake Charmer'
+        'Data Pipeline Architect', 'Snake Charmer', 'Generator Guardian',
+        'Lambda Luminary', 'Context Manager Commander', 'Metaclass Mystic',
+        'NumPy Ninja', 'Scikit-Learn Sensei', 'TensorFlow Titan',
+        'AsyncIO Adept', 'Type Hint Herald', 'Pytest Prophet',
+        'Virtual Environment Virtuoso', 'pip Package Practitioner', 'PEP Perfectionist'
       ];
       expect(validArchetypes).toContain(result.archetype);
     });
@@ -123,7 +135,12 @@ describe('geminiService', () => {
       const validArchetypes = [
         'Spring Framework Oracle', 'Thread Pool Tactician', 'Maven Magister', 
         'Garbage Collection Guru', 'Exception Handler Extraordinaire', 
-        'Annotation Architect', 'Bytecode Blacksmith'
+        'Annotation Architect', 'Bytecode Blacksmith', 'JVM Jedi',
+        'Hibernate Harbinger', 'Stream API Sorcerer', 'Lambda Lord',
+        'Optional Optimizer', 'Reflection Ranger', 'Serialization Sentinel',
+        'Concurrency Connoisseur', 'Design Pattern Devotee', 'JDBC Journeyman',
+        'Gradle Grandmaster', 'Microservice Monarch', 'Spring Boot Baron',
+        'Dependency Injection Diplomat'
       ];
       expect(validArchetypes).toContain(result.archetype);
     });
@@ -134,7 +151,11 @@ describe('geminiService', () => {
       const validArchetypes = [
         'Channel Conductor', 'Goroutine Grandmaster', 'Concurrency Crusader', 
         'Interface Implementor', 'Gopher Commander', 'Microservice Maverick',
-        'Error Handler Elite'
+        'Error Handler Elite', 'Defer Defender', 'Panic Recovery Ranger',
+        'Go Modules Manager', 'Context Conjurer', 'Slice Surgeon',
+        'Map Manipulator', 'Struct Sculptor', 'Method Maestro',
+        'Package Practitioner', 'Testing Table Titan', 'Benchmark Baron',
+        'HTTP Handler Hero', 'JSON Marshal Master', 'Buffer Builder Bard'
       ];
       expect(validArchetypes).toContain(result.archetype);
     });
@@ -145,7 +166,11 @@ describe('geminiService', () => {
       const validArchetypes = [
         'Borrow Checker Whisperer', 'Memory Safety Sentinel', 'Lifetime Legend', 
         'Ownership Oracle', 'Zero-Cost Zealot', 'Cargo Cultist',
-        'Systems Programming Samurai'
+        'Systems Programming Samurai', 'Trait Implementor Titan', 'Macro Magician',
+        'Result Type Ranger', 'Option Handler Oracle', 'Pattern Matching Paladin',
+        'Smart Pointer Sage', 'Unsafe Code Sentinel', 'Iterator Invoker',
+        'Async Runtime Ruler', 'Fearless Concurrency Champion', 'Move Semantics Master',
+        'Type State Tactician', 'Phantom Type Philosopher', 'Compiler Error Conqueror'
       ];
       expect(validArchetypes).toContain(result.archetype);
     });
@@ -156,7 +181,11 @@ describe('geminiService', () => {
       const validArchetypes = [
         'Coroutine Conjurer', 'Extension Function Expert', 'Sealed Class Specialist', 
         'Data Class Dynamo', 'Jetpack Compose Composer', 'Android Authority',
-        'Null-Safety Knight'
+        'Null-Safety Knight', 'Scope Function Sage', 'Delegation Diplomat',
+        'Inline Function Innovator', 'Reified Type Ruler', 'DSL Designer',
+        'Flow Facilitator', 'Channel Champion', 'Multiplatform Maven',
+        'Context Receiver Ranger', 'Value Class Virtuoso', 'Contracts Champion',
+        'Smart Cast Sorcerer', 'When Expression Wizard', 'Destructuring Declaration Devotee'
       ];
       expect(validArchetypes).toContain(result.archetype);
     });

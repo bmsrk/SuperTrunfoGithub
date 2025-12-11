@@ -123,102 +123,179 @@ export const generateLocalCardStats = (
   const isProlific = user.public_repos > 30;
   const isPopular = user.followers > 100;
   
-  // Language-based archetype base - Expanded and more creative
+  // Language-based archetype base - 3x Expanded with even more creative variations
   const langArchetypes: Record<string, string[]> = {
     'JavaScript': [
       'Async Sorcerer', 'Promise Whisperer', 'Event Loop Maestro', 
       'Callback Conjurer', 'DOM Manipulator Supreme', 'ES6 Archmage', 
-      'Node.js Necromancer'
+      'Node.js Necromancer', 'Closure Craftsman', 'Prototype Prophet',
+      'Module Bundler Maven', 'JSON Juggler', 'Webpack Wizard',
+      'React Router Ranger', 'Babel Bard', 'npm Nomad',
+      'Express.js Engineer', 'V8 Virtuoso', 'Middleware Mystic',
+      'Hoisting Handler', 'Scope Chain Shaman', 'This Binding Titan'
     ],
     'TypeScript': [
       'Type Enforcer', 'Generic Overlord', 'Interface Sculptor', 
       'Compiler Tamer', 'Strict Mode Champion', 'Decorator Virtuoso',
-      'Angular Guardian'
+      'Angular Guardian', 'Union Type Unifier', 'Namespace Navigator',
+      'Type Guard Gladiator', 'Enum Enchanter', 'Tuple Tactician',
+      'Conditional Type Conjurer', 'Mapped Type Master', 'Utility Type Utilizer',
+      'Type Inference Invoker', 'Readonly Ruler', 'Const Assertion Champion',
+      'Literal Type Lord', 'Template Literal Luminary', 'Type Predicate Paladin'
     ],
     'Python': [
       'Pythonic Sage', 'List Comprehension Master', 'Pandas Wrangler', 
       'Decorator Enchanter', 'Django Dynamo', 'Flask Alchemist', 
-      'Data Pipeline Architect', 'Snake Charmer'
+      'Data Pipeline Architect', 'Snake Charmer', 'Generator Guardian',
+      'Lambda Luminary', 'Context Manager Commander', 'Metaclass Mystic',
+      'NumPy Ninja', 'Scikit-Learn Sensei', 'TensorFlow Titan',
+      'AsyncIO Adept', 'Type Hint Herald', 'Pytest Prophet',
+      'Virtual Environment Virtuoso', 'pip Package Practitioner', 'PEP Perfectionist'
     ],
     'Java': [
       'Spring Framework Oracle', 'Thread Pool Tactician', 'Maven Magister', 
       'Garbage Collection Guru', 'Exception Handler Extraordinaire', 
-      'Annotation Architect', 'Bytecode Blacksmith'
+      'Annotation Architect', 'Bytecode Blacksmith', 'JVM Jedi',
+      'Hibernate Harbinger', 'Stream API Sorcerer', 'Lambda Lord',
+      'Optional Optimizer', 'Reflection Ranger', 'Serialization Sentinel',
+      'Concurrency Connoisseur', 'Design Pattern Devotee', 'JDBC Journeyman',
+      'Gradle Grandmaster', 'Microservice Monarch', 'Spring Boot Baron',
+      'Dependency Injection Diplomat'
     ],
     'Go': [
       'Channel Conductor', 'Goroutine Grandmaster', 'Concurrency Crusader', 
       'Interface Implementor', 'Gopher Commander', 'Microservice Maverick',
-      'Error Handler Elite'
+      'Error Handler Elite', 'Defer Defender', 'Panic Recovery Ranger',
+      'Go Modules Manager', 'Context Conjurer', 'Slice Surgeon',
+      'Map Manipulator', 'Struct Sculptor', 'Method Maestro',
+      'Package Practitioner', 'Testing Table Titan', 'Benchmark Baron',
+      'HTTP Handler Hero', 'JSON Marshal Master', 'Buffer Builder Bard'
     ],
     'Rust': [
       'Borrow Checker Whisperer', 'Memory Safety Sentinel', 'Lifetime Legend', 
       'Ownership Oracle', 'Zero-Cost Zealot', 'Cargo Cultist',
-      'Systems Programming Samurai'
+      'Systems Programming Samurai', 'Trait Implementor Titan', 'Macro Magician',
+      'Result Type Ranger', 'Option Handler Oracle', 'Pattern Matching Paladin',
+      'Smart Pointer Sage', 'Unsafe Code Sentinel', 'Iterator Invoker',
+      'Async Runtime Ruler', 'Fearless Concurrency Champion', 'Move Semantics Master',
+      'Type State Tactician', 'Phantom Type Philosopher', 'Compiler Error Conqueror'
     ],
     'C++': [
       'Template Metaprogrammer', 'RAII Ranger', 'STL Sorcerer', 
       'Pointer Paladin', 'Virtual Function Virtuoso', 'Performance Perfectionist',
-      'Cache-Friendly Craftsman'
+      'Cache-Friendly Craftsman', 'Move Semantics Master', 'Smart Pointer Sage',
+      'Exception Safety Expert', 'Undefined Behavior Banisher', 'Memory Leak Hunter',
+      'Lambda Luminary', 'Constexpr Conjurer', 'Compile Time Champion',
+      'Template Specialization Specialist', 'SFINAE Sorcerer', 'C++20 Concepts Connoisseur',
+      'Operator Overload Overlord', 'Copy Elision Expert', 'Inline Assembly Artisan'
     ],
     'C#': [
       'LINQ Luminary', 'Async/Await Adept', 'Entity Framework Enchanter', 
       'Blazor Battlemage', '.NET Core Commander', 'Delegate Diplomat',
-      'Task Parallel Titan'
+      'Task Parallel Titan', 'Extension Method Expert', 'Nullable Reference Navigator',
+      'Pattern Matching Prodigy', 'Record Type Ruler', 'Init-Only Innovator',
+      'Top-Level Statement Sage', 'Target-Typed New Navigator', 'Span<T> Specialist',
+      'Memory<T> Master', 'IAsyncEnumerable Implementor', 'C# 12 Champion',
+      'Primary Constructor Practitioner', 'Collection Expressions Expert', 'Lambda Improvements Lord'
     ],
     'Ruby': [
       'Rails Ranger', 'Metaprogramming Mystic', 'Block Bender', 
       'Gem Guardian', 'DSL Designer', 'Rake Master',
-      'Convention Over Configuration Crusader'
+      'Convention Over Configuration Crusader', 'ActiveRecord Architect', 'RSpec Ruler',
+      'Symbol Sage', 'Proc Prophet', 'Mixin Maestro',
+      'Method Missing Maven', 'Monkey Patching Paladin', 'Enumerable Expert',
+      'Singleton Sorcerer', 'Class Variable Champion', 'Fiber Facilitator',
+      'ERB Template Titan', 'Bundler Baron', 'Ruby Version Manager Virtuoso'
     ],
     'PHP': [
       'Laravel Legend', 'Composer Conductor', 'Symfony Sorcerer', 
       'WordPress Wizard', 'Array Artisan', 'Namespace Navigator',
-      'PDO Practitioner'
+      'PDO Practitioner', 'Eloquent ORM Oracle', 'Blade Template Bard',
+      'PHP 8 Pioneer', 'Type Declaration Tactician', 'Union Type Unifier',
+      'Named Arguments Navigator', 'Attribute Architect', 'Constructor Property Promoter',
+      'Match Expression Master', 'Nullsafe Operator Ninja', 'Fibers Facilitator',
+      'Trait Tactician', 'PSR Standard Sentinel', 'Dependency Injection Diplomat'
     ],
     'Swift': [
       'SwiftUI Sculptor', 'Protocol-Oriented Prodigy', 'Combine Champion', 
       'Optional Unwrapper', 'CoreData Custodian', 'iOS Innovator',
-      'Property Wrapper Wizard'
+      'Property Wrapper Wizard', 'Result Builder Ranger', 'Async/Await Architect',
+      'Actor Artisan', 'Sendable Sentinel', 'MainActor Master',
+      'Codable Conjurer', 'KeyPath Keeper', 'Type Erasure Expert',
+      'Opaque Type Oracle', 'ARC Memory Manager', 'Closure Capture Champion',
+      'Value Semantics Virtuoso', 'Copy-on-Write Craftsman', 'Swift Concurrency Commander'
     ],
     'Kotlin': [
       'Coroutine Conjurer', 'Extension Function Expert', 'Sealed Class Specialist', 
       'Data Class Dynamo', 'Jetpack Compose Composer', 'Android Authority',
-      'Null-Safety Knight'
+      'Null-Safety Knight', 'Scope Function Sage', 'Delegation Diplomat',
+      'Inline Function Innovator', 'Reified Type Ruler', 'DSL Designer',
+      'Flow Facilitator', 'Channel Champion', 'Multiplatform Maven',
+      'Context Receiver Ranger', 'Value Class Virtuoso', 'Contracts Champion',
+      'Smart Cast Sorcerer', 'When Expression Wizard', 'Destructuring Declaration Devotee'
     ],
     'Dart': [
       'Flutter Phenomenon', 'Widget Tree Weaver', 'State Manager Sage', 
       'Async Stream Sorcerer', 'Hot Reload Hero', 'Material Design Maestro',
-      'Riverpod Ruler'
+      'Riverpod Ruler', 'BLoC Pattern Baron', 'Provider Prophet',
+      'GetX Grandmaster', 'Navigator 2.0 Navigator', 'Null Safety Ninja',
+      'Extension Method Expert', 'Mixin Master', 'Late Initialization Lord',
+      'Required Modifier Ranger', 'Sound Type System Sentinel', 'Isolate Implementor',
+      'Platform Channel Champion', 'Custom Paint Craftsman', 'Animation Architect'
     ],
     'R': [
       'ggplot2 Grandmaster', 'Statistical Storyteller', 'Tidyverse Titan', 
       'Data Frame Wizard', 'Shiny App Architect', 'R Markdown Maestro',
-      'Machine Learning Mystic'
+      'Machine Learning Mystic', 'dplyr Data Diplomat', 'tidyr Tactician',
+      'purrr Practitioner', 'readr Reader', 'tibble Tamer',
+      'stringr String Surgeon', 'forcats Factor Facilitator', 'lubridate Time Lord',
+      'caret Classification Champion', 'randomForest Ranger', 'glmnet Guardian',
+      'ggplot2 Geom Genius', 'RStudio Ruler', 'Package Development Prophet'
     ],
     'Shell': [
       'Bash Script Barbarian', 'Pipe Dream Architect', 'Sed & Awk Sorcerer', 
       'Cron Job Craftsman', 'Environment Variable Virtuoso', 'One-Liner Legend',
-      'Terminal Tamer'
+      'Terminal Tamer', 'Regex Ranger', 'Grep Guardian',
+      'Find File Facilitator', 'SSH Sentinel', 'Process Control Paladin',
+      'Shell Expansion Expert', 'Background Job Baron', 'Signal Handler Hero',
+      'Shell Function Sage', 'Parameter Expansion Prophet', 'Subshell Specialist',
+      'Redirection Ruler', 'Exit Status Examiner', 'Script Debugging Detective'
     ],
     'C': [
       'Malloc Master', 'Segfault Survivor', 'Pointer Arithmetician',
       'System Call Summoner', 'Low-Level Legend', 'Header File Harmonizer',
-      'Bit Manipulation Bard'
+      'Bit Manipulation Bard', 'Memory Management Maestro', 'Buffer Overflow Banisher',
+      'Undefined Behavior Detector', 'Volatile Variable Virtuoso', 'Preprocessor Prophet',
+      'Struct Packing Specialist', 'Union Utilizer', 'Function Pointer Facilitator',
+      'Static Analyzer Sage', 'Inline Assembly Artist', 'Memory-Mapped I/O Master',
+      'Linkage Lord', 'Translation Unit Tactician', 'Standards Compliance Champion'
     ],
     'Scala': [
       'Functional Programming Philosopher', 'Akka Actor Adept', 'Pattern Matching Prodigy',
       'Immutability Idealist', 'Higher-Order Hero', 'Spark Stream Sage',
-      'Type Inference Titan'
+      'Type Inference Titan', 'Implicit Implementor', 'Type Class Tactician',
+      'For-Comprehension Facilitator', 'Case Class Champion', 'Sealed Trait Specialist',
+      'Monadic Maestro', 'Future Facilitator', 'Cats Effect Expert',
+      'ZIO Zealot', 'Shapeless Shaman', 'Macro Master',
+      'Type-Level Programming Prophet', 'Context Bounds Bard', 'Variance Virtuoso'
     ],
     'Elixir': [
       'OTP Overlord', 'Process Tree Practitioner', 'Phoenix Framework Phoenix',
       'Pattern Matching Poet', 'Fault-Tolerance Fanatic', 'Ecto Enchanter',
-      'Erlang VM Virtuoso'
+      'Erlang VM Virtuoso', 'GenServer Guardian', 'Supervisor Strategy Sage',
+      'Pipe Operator Prophet', 'Macro Metaprogrammer', 'Protocol Practitioner',
+      'LiveView Luminary', 'PubSub Paladin', 'Task Async Tactician',
+      'Stream Sorcerer', 'Mix Tool Master', 'Behaviour Baron',
+      'Let It Crash Lord', 'Hot Code Reload Hero', 'Distributed Systems Diplomat'
     ],
     'Haskell': [
       'Monad Mystic', 'Pure Function Fanatic', 'Lazy Evaluation Legend',
       'Type Class Tactician', 'Functor Philosopher', 'Category Theory Champion',
-      'Immutability Immortal'
+      'Immutability Immortal', 'Applicative Architect', 'Monad Transformer Master',
+      'Lens Library Luminary', 'Parser Combinator Prophet', 'GADTs Guardian',
+      'Type Family Facilitator', 'Existential Type Expert', 'Phantom Type Practitioner',
+      'Free Monad Fanatic', 'Effect System Sage', 'Recursion Scheme Ruler',
+      'Continuation Passing Craftsman', 'Church Encoding Champion', 'Lambda Calculus Lord'
     ]
   };
   
