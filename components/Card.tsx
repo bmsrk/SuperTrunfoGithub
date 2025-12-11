@@ -203,6 +203,8 @@ export const Card: React.FC<CardProps> = memo(({ data }) => {
                             } as React.CSSProperties}
                         />
                         
+                        {/* AI ART badge: Only shown when aiImageUrl is present (meaning an external AI service generated the image).
+                            Without an external API key, aiImageUrl is undefined and the GitHub avatar is used instead. */}
                         {aiImageUrl && (
                             <div className="absolute top-3 right-3 bg-black/70 backdrop-blur-md text-white text-[9px] px-2 py-0.5 rounded-full font-bold flex items-center gap-1 shadow-lg border border-white/20 z-20">
                                 <Sparkles size={10} className="text-purple-400" /> AI ART
