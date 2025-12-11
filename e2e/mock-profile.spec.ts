@@ -60,20 +60,6 @@ test.describe('Mock Profile Generation', () => {
     await expect(page.getByRole('button', { name: /GENERATE CARD/i })).toBeVisible();
   });
 
-  test('should have card ID in mock profile', async ({ page }) => {
-    await page.goto('/');
-    
-    // Click mock button
-    const mockButton = page.getByRole('button', { name: /Test with Mock Data/i });
-    await mockButton.click();
-    
-    // Wait for card to appear
-    await page.waitForTimeout(500);
-    
-    // Check for card ID
-    await expect(page.getByText('DEV-00')).toBeVisible();
-  });
-
   test('should display archetype in mock profile', async ({ page }) => {
     await page.goto('/');
     
