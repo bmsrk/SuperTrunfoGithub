@@ -6,18 +6,6 @@
 
 Generate custom Super Trunfo trading cards based on GitHub profiles using Gemini AI analysis.
 
-## 📸 Screenshots
-
-<div align="center">
-
-### Home Page with AI Features Info
-<img width="600" alt="Homepage" src="https://github.com/user-attachments/assets/926fa662-efa5-4183-adea-ca90702f92cc" />
-
-### Generated Card Example
-<img width="600" alt="Card Display" src="https://github.com/user-attachments/assets/87a0ad5d-032d-4b91-8608-f33192b897a0" />
-
-</div>
-
 ## 🚀 Live Demo
 
 Visit the live app: [https://bmsrk.github.io/SuperTrunfoGithub/](https://bmsrk.github.io/SuperTrunfoGithub/)
