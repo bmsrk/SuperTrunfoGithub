@@ -38,8 +38,7 @@ export const useCardGenerator = () => {
             repoSummary.topLanguages[0] || 'Code', 
             user,
             repoSummary.allTopics || [],
-            googleApiKey, 
-            user.avatar_url
+            googleApiKey
           );
       } catch (e) {
           console.warn("Failed to fetch/generate image, trying generation without source image...", e);
@@ -51,12 +50,11 @@ export const useCardGenerator = () => {
                repoSummary.topLanguages[0] || 'Code',
                user,
                repoSummary.allTopics || [],
-               googleApiKey, 
-               user.avatar_url
+               googleApiKey
              );
           } catch (innerE) {
              console.warn("AI Image generation completely failed, will use GitHub avatar", innerE);
-             // Set to undefined to let Card component use GitHub avatar
+             // aiImageUrl stays undefined - Card component will use GitHub avatar without AI tag
              aiImageUrl = undefined;
           }
       }

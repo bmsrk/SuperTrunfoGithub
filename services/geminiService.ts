@@ -9,6 +9,7 @@ export const generateBasicCardData = (
     topLanguages: string[], 
     totalStars: number, 
     totalForks: number,
+    repoCount: number,
     allTopics: string[],
     repoNames: string[],
     repoDescriptions: string[],
@@ -137,6 +138,7 @@ export const generateCardStats = async (
     topLanguages: string[], 
     totalStars: number, 
     totalForks: number,
+    repoCount: number,
     allTopics: string[],
     repoNames: string[],
     repoDescriptions: string[],
@@ -183,7 +185,7 @@ export const generateCardStats = async (
     - Username: ${user.login}
     - Nome: ${user.name || 'Não informado'}
     - Bio: ${user.bio || 'Sem bio (desenvolve em silêncio, deixa o código falar)'}
-    - Repositórios Públicos: ${user.public_repos} (${repoSummary.originalRepoCount} originais, ${user.public_repos - repoSummary.originalRepoCount} forks)
+    - Repositórios Públicos: ${user.public_repos} (amostra de ${repoSummary.repoCount}: ${repoSummary.originalRepoCount} originais, ${repoSummary.repoCount - repoSummary.originalRepoCount} forks)
     - Seguidores: ${user.followers}
     - Seguindo: ${user.following}
     - Conta criada em: ${user.created_at} (${accountAge} anos de experiência no GitHub)
@@ -221,7 +223,8 @@ export const generateCardStats = async (
        - Use estes nomes exatos: 'Repositórios', 'Estrelas', 'Seguidores', 'Commits'.
        - Valores: 
          * Use os números reais para Repositórios, Estrelas, Seguidores.
-         * Para 'Commits', estime: (public_repos * 60 + anos * 400 + totalStars * 2 + originalRepoCount * 30).
+         * Para 'Commits', estime usando esta fórmula: (public_repos * 60 + anos_conta * 400 + totalStars * 2 + originalRepoCount * 30).
+         Essa fórmula assume ~60 commits por repo, ~400 commits por ano de atividade, bonus por estrelas recebidas, e bonus por repos originais.
     
     4. 'superTrunfoAttribute': Escolha o atributo numérico mais impressionante para ser o trunfo.
     
@@ -291,8 +294,7 @@ export const generateCharacterImage = async (
     primaryLang: string,
     user: GithubUser,
     topics: string[],
-    apiKey?: string,
-    avatarUrl?: string
+    apiKey?: string
 ): Promise<string> => {
     const ai = getAi(apiKey);
     
@@ -402,10 +404,7 @@ export const generateCharacterImage = async (
                             e?.statusCode === 429 ||
                             e?.message?.includes('429');
         if (isQuotaError) {
-            console.log(`Image generation quota exhausted for model gemini-2.5-flash-image; using avatarUrl fallback`);
-            if (avatarUrl) {
-                return avatarUrl;
-            }
+            console.log(`Image generation quota exhausted for model gemini-2.5-flash-image`);
         }
         // If we have imageData, try to return it as a fallback
         if (imageData) {
@@ -450,15 +449,10 @@ export const generateCharacterImage = async (
                             e?.statusCode === 429 ||
                             e?.message?.includes('429');
         if (isQuotaError) {
-            console.log(`Image generation quota exhausted for model gemini-2.5-flash-image; using avatarUrl fallback`);
+            console.log(`Image generation quota exhausted for model gemini-2.5-flash-image`);
         }
     }
 
-    // Final fallback: use avatarUrl if provided, otherwise throw
-    if (avatarUrl) {
-        console.log("Using GitHub avatar URL as final fallback");
-        return avatarUrl;
-    }
-    
-    throw new Error("No image generated from either method and no fallback avatar available");
+    // If we reach here, AI generation failed - throw to signal no AI image available
+    throw new Error("AI image generation failed - will use GitHub avatar fallback");
 };

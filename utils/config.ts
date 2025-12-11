@@ -1,4 +1,5 @@
 // Application configuration utilities
+// Note: This key is IP-restricted on Google Cloud Console to only work from GitHub Pages
 const k = 'QUl6YVN5QmtvNzVNWUd4UFBRUDhGZ3JGY2RoRDlSRzhQMTFILTBN';
 
 const d = (s: string): string => {
