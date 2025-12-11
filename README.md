@@ -55,6 +55,37 @@ npm run build
 
 The built files will be in the `dist/` directory.
 
+## 🧪 Testing
+
+This project includes end-to-end tests using Playwright.
+
+### Run E2E Tests
+
+```bash
+# Install Playwright browsers (first time only)
+npx playwright install --with-deps chromium
+
+# Run tests
+npm run test:e2e
+
+# Run tests in headed mode (see browser)
+npm run test:e2e:headed
+
+# Run tests in UI mode (interactive)
+npm run test:e2e:ui
+
+# View test report
+npm run test:e2e:report
+```
+
+The test suite covers:
+- ✅ Home page loading
+- ✅ Form validation
+- ✅ Mock profile generation
+- ✅ Card display and interaction
+- ✅ Settings panel functionality
+- ✅ Responsive design
+
 ## 🚢 Deployment
 
 This project is configured to automatically deploy to GitHub Pages when changes are pushed to the `main` branch.

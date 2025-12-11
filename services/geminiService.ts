@@ -1,6 +1,71 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { GithubUser, CardData } from '../types';
 
+// Fallback function to generate basic card data without AI
+export const generateBasicCardData = (
+  user: GithubUser,
+  repoSummary: { topLanguages: string[], totalStars: number, totalForks: number }
+): CardData => {
+  const accountAge = new Date().getFullYear() - new Date(user.created_at).getFullYear();
+  const estimatedCommits = user.public_repos * 50 + accountAge * 300;
+  
+  // Determine archetype based on top language
+  const topLang = repoSummary.topLanguages[0] || 'Code';
+  const archetypes: Record<string, string> = {
+    'JavaScript': 'Frontend Alchemist',
+    'TypeScript': 'Type-Safe Paladin',
+    'Python': 'Data Sorcerer',
+    'Java': 'Enterprise Architect',
+    'Go': 'Concurrency Master',
+    'Rust': 'Memory Guardian',
+    'C++': 'Performance Ninja',
+    'C#': 'Framework Wizard',
+    'Ruby': 'Rails Conductor',
+    'PHP': 'Web Craftsman',
+  };
+  
+  const archetype = archetypes[topLang] || `${topLang} Developer`;
+  
+  // Generate a simple description
+  const descriptions = [
+    'Commits code with precision and style.',
+    'Turns coffee into code.',
+    'Debugging is their superpower.',
+    'Writes clean code while others sleep.',
+    'The architect of elegant solutions.',
+  ];
+  const description = descriptions[Math.floor(Math.random() * descriptions.length)];
+  
+  // Determine which stat is the trump
+  const stats = [
+    { label: 'Repositórios', value: user.public_repos },
+    { label: 'Estrelas', value: repoSummary.totalStars },
+    { label: 'Seguidores', value: user.followers },
+    { label: 'Commits', value: estimatedCommits, unit: '+' }
+  ];
+  
+  // Find the highest stat for trump
+  const maxStat = stats.reduce((max, stat) => stat.value > max.value ? stat : max, stats[0]);
+  
+  // Generate special abilities based on stats
+  const abilities = [
+    { name: 'Git Push --force', description: 'Dobra o valor de Commits se for o atributo escolhido.' },
+    { name: 'Merge Master', description: 'Ganha automaticamente se o oponente tiver menos repositórios.' },
+    { name: 'Code Review', description: 'Anula o trunfo do oponente se tiver mais estrelas.' },
+    { name: 'Sudo Deploy', description: 'Troca o valor de Seguidores com o oponente.' },
+  ];
+  const specialAbility = abilities[Math.floor(Math.random() * abilities.length)];
+  
+  return {
+    id: `DEV-${Math.floor(Math.random() * 100).toString().padStart(2, '0')}`,
+    archetype,
+    description,
+    stats,
+    specialAbility,
+    superTrunfoAttribute: maxStat.label
+  };
+};
+
 // Static constants defined outside function scope to prevent reallocation
 const ART_STYLES = [
     "Cyberpunk 2077 aesthetic, neon-noir, high contrast, chromatic aberration",
@@ -37,9 +102,8 @@ const POWER_ELEMENTS = [
 ];
 
 const getAi = (apiKey?: string) => {
-    const key = apiKey || process.env.API_KEY;
-    if (!key) throw new Error("API Key not found. Please add your Google API Key in settings.");
-    return new GoogleGenAI({ apiKey: key });
+    if (!apiKey) throw new Error("API Key not found. Please add your Google API Key in settings.");
+    return new GoogleGenAI({ apiKey: apiKey });
 };
 
 const extractImageFromResponse = (response: any): string | null => {
