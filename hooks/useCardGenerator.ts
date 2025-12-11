@@ -19,35 +19,28 @@ export const useCardGenerator = () => {
       const repos = await fetchGithubRepos(username, githubToken);
       const repoSummary = summarizeRepoData(repos);
 
-      // 2. Generate Stats - Use AI if API key provided, otherwise use basic generation
+      // 2. Generate Stats - Always try AI generation (uses default key if none provided)
       let cardData;
-      if (googleApiKey) {
-        try {
-          cardData = await generateCardStats(user, repoSummary, googleApiKey);
-        } catch (err) {
-          console.warn("AI card generation failed, using basic generation", err);
-          cardData = generateBasicCardData(user, repoSummary);
-        }
-      } else {
-        // No API key - use basic card generation
+      try {
+        cardData = await generateCardStats(user, repoSummary, googleApiKey);
+      } catch (err) {
+        console.warn("AI card generation failed, using basic generation", err);
         cardData = generateBasicCardData(user, repoSummary);
       }
       
-      // 3. Generate AI Image (only if API key is provided)
+      // 3. Generate AI Image - Always attempt (uses default key if none provided)
       let aiImageUrl: string | undefined = undefined;
-      if (googleApiKey) {
-        try {
-            const imageData = await fetchImageAsBase64(user.avatar_url);
-            aiImageUrl = await generateCharacterImage(imageData, cardData.archetype, repoSummary.topLanguages[0] || 'Code', googleApiKey);
-        } catch (e) {
-            console.warn("Failed to fetch/generate image, trying generation without source image...", e);
-            try {
-               // Fallback to text-only generation
-               aiImageUrl = await generateCharacterImage(null, cardData.archetype, repoSummary.topLanguages[0] || 'Code', googleApiKey);
-            } catch (innerE) {
-               console.warn("AI Image generation completely failed, will use GitHub avatar", innerE);
-            }
-        }
+      try {
+          const imageData = await fetchImageAsBase64(user.avatar_url);
+          aiImageUrl = await generateCharacterImage(imageData, cardData.archetype, repoSummary.topLanguages[0] || 'Code', googleApiKey);
+      } catch (e) {
+          console.warn("Failed to fetch/generate image, trying generation without source image...", e);
+          try {
+             // Fallback to text-only generation
+             aiImageUrl = await generateCharacterImage(null, cardData.archetype, repoSummary.topLanguages[0] || 'Code', googleApiKey);
+          } catch (innerE) {
+             console.warn("AI Image generation completely failed, will use GitHub avatar", innerE);
+          }
       }
 
       setProfile({ user, cardData, aiImageUrl });

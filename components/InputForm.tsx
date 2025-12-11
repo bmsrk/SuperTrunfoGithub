@@ -41,7 +41,7 @@ export const InputForm: React.FC<InputFormProps> = memo(({ onSubmit, onMock, isL
       {/* Decorative Glow */}
       <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-yellow-500 via-purple-500 to-blue-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500"></div>
 
-      <div className="flex items-center justify-between mb-6 text-white relative z-10">
+      <div className="flex items-center justify-between mb-4 text-white relative z-10">
         <div className="flex items-center gap-3">
             <div className="bg-zinc-800 p-2 rounded-lg">
                 <Github size={24} className="text-white" />
@@ -58,6 +58,20 @@ export const InputForm: React.FC<InputFormProps> = memo(({ onSubmit, onMock, isL
         >
             <Settings size={18} />
         </button>
+      </div>
+
+      {/* Info banner about AI features */}
+      <div className="bg-gradient-to-r from-purple-900/30 to-indigo-900/30 border border-purple-700/30 rounded-lg p-3 mb-4 relative z-10">
+        <div className="flex items-start gap-2">
+          <Sparkles size={16} className="text-purple-400 flex-shrink-0 mt-0.5" />
+          <div className="text-xs text-purple-200">
+            <p className="font-semibold mb-1">✨ AI-Powered Features</p>
+            <p className="text-purple-300/90">
+              This app uses Google Gemini AI to generate unique character art and card stats. 
+              The default API key has limited quota. For unlimited usage, add your own Gemini API key in settings.
+            </p>
+          </div>
+        </div>
       </div>
       
       <form onSubmit={handleSubmit} className="flex flex-col gap-4 relative z-10">
@@ -95,7 +109,7 @@ export const InputForm: React.FC<InputFormProps> = memo(({ onSubmit, onMock, isL
                         className="w-full bg-transparent border-b border-zinc-700 text-zinc-300 text-xs focus:outline-none focus:border-purple-500 px-0 py-1 placeholder-zinc-700 transition-colors"
                     />
                     <p className="text-[9px] text-zinc-600 mt-1">
-                        Use your own Gemini key if the default quota is exceeded.
+                        A default key is provided but has limited quota. Add your own for unlimited AI generation.
                     </p>
                 </div>
             </div>
