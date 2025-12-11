@@ -79,7 +79,7 @@ test.describe('UI Elements and Styling', () => {
     // Wait for card
     await page.waitForTimeout(500);
     
-    // Check for footer text
-    await expect(page.getByText(/Generated with Gemini/i)).toBeVisible();
+    // Check for footer text - updated to reflect local generator
+    await expect(page.getByText(/Generated with local deterministic generator/i)).toBeVisible();
   });
 });
