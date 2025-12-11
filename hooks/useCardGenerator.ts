@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { CombinedProfile } from '../types';
 import { fetchGithubUser, fetchGithubRepos, summarizeRepoData, fetchImageAsBase64 } from '../services/githubService';
-import { generateCardStats, generateCharacterImage } from '../services/geminiService';
+import { generateCardStats, generateCharacterImage, generateBasicCardData } from '../services/geminiService';
 
 export const useCardGenerator = () => {
   const [loading, setLoading] = useState(false);
@@ -19,28 +19,41 @@ export const useCardGenerator = () => {
       const repos = await fetchGithubRepos(username, githubToken);
       const repoSummary = summarizeRepoData(repos);
 
-      // 2. Generate Stats via Gemini
-      const cardData = await generateCardStats(user, repoSummary, googleApiKey);
+      // 2. Generate Stats - Use AI if API key provided, otherwise use basic generation
+      let cardData;
+      if (googleApiKey) {
+        try {
+          cardData = await generateCardStats(user, repoSummary, googleApiKey);
+        } catch (err) {
+          console.warn("AI card generation failed, using basic generation", err);
+          cardData = generateBasicCardData(user, repoSummary);
+        }
+      } else {
+        // No API key - use basic card generation
+        cardData = generateBasicCardData(user, repoSummary);
+      }
       
+      // 3. Generate AI Image (only if API key is provided)
       let aiImageUrl: string | undefined = undefined;
-      try {
-          // 3. Generate AI Image
-          const imageData = await fetchImageAsBase64(user.avatar_url);
-          aiImageUrl = await generateCharacterImage(imageData, cardData.archetype, repoSummary.topLanguages[0] || 'Code', googleApiKey);
-      } catch (e) {
-          console.warn("Failed to fetch/generate image, trying generation without source image...", e);
-          try {
-             // Fallback to text-only generation
-             aiImageUrl = await generateCharacterImage(null, cardData.archetype, repoSummary.topLanguages[0] || 'Code', googleApiKey);
-          } catch (innerE) {
-             console.warn("AI Image generation completely failed", innerE);
-          }
+      if (googleApiKey) {
+        try {
+            const imageData = await fetchImageAsBase64(user.avatar_url);
+            aiImageUrl = await generateCharacterImage(imageData, cardData.archetype, repoSummary.topLanguages[0] || 'Code', googleApiKey);
+        } catch (e) {
+            console.warn("Failed to fetch/generate image, trying generation without source image...", e);
+            try {
+               // Fallback to text-only generation
+               aiImageUrl = await generateCharacterImage(null, cardData.archetype, repoSummary.topLanguages[0] || 'Code', googleApiKey);
+            } catch (innerE) {
+               console.warn("AI Image generation completely failed, will use GitHub avatar", innerE);
+            }
+        }
       }
 
       setProfile({ user, cardData, aiImageUrl });
 
     } catch (err: any) {
-      setError(err.message || 'Something went wrong. Please check the username or API key.');
+      setError(err.message || 'Something went wrong. Please check the username.');
     } finally {
       setLoading(false);
     }
