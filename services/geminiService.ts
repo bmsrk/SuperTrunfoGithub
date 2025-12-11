@@ -112,6 +112,7 @@ const getAi = (apiKey?: string) => {
 };
 
 const extractImageFromResponse = (response: any): string | null => {
+    console.debug("Extracting image from AI response:", JSON.stringify(response, null, 2));
     for (const candidate of response.candidates || []) {
         for (const part of candidate.content?.parts || []) {
             if (part.inlineData) {
@@ -213,7 +214,8 @@ export const generateCharacterImage = async (
     imageData: { base64: string; mimeType: string } | null, 
     archetype: string, 
     primaryLang: string,
-    apiKey?: string
+    apiKey?: string,
+    avatarUrl?: string
 ): Promise<string> => {
     const ai = getAi(apiKey);
     
@@ -267,35 +269,71 @@ export const generateCharacterImage = async (
             if (img) return img;
             console.warn("Image-to-Image returned no image data, falling back...");
         }
-    } catch (e) {
-        console.warn("Image-to-Image generation failed, falling back to Text-to-Image.", e);
+    } catch (e: any) {
+        console.error("Image-to-Image generation failed:", e);
+        // Check if this is a quota error
+        const isQuotaError = e?.message?.includes('RESOURCE_EXHAUSTED') || 
+                            e?.status === 429 || 
+                            e?.statusCode === 429 ||
+                            e?.message?.includes('429');
+        if (isQuotaError) {
+            console.log(`Image generation quota exhausted for model gemini-2.5-flash-image; using avatarUrl fallback`);
+            if (avatarUrl) {
+                return avatarUrl;
+            }
+        }
+        // If we have imageData, try to return it as a fallback
+        if (imageData) {
+            console.log("Returning original image data as fallback");
+            return `data:${imageData.mimeType};base64,${imageData.base64}`;
+        }
     }
 
     console.log("Attempting Text-to-Image generation...");
 
-    // Attempt 2: Text-to-Image (Fallback)
-    const fallbackPrompt = `
-        Create a masterpiece trading card illustration of a "${archetype}".
-        
-        ${basePrompt}
-        
-        Description:
-        An epic, powerful character representing a master of ${primaryLang}. 
-        They should look like a ${archetype}. 
-        Composition: Close-up Portrait, Head and Shoulders, Face clearly focused.
-        Dynamic pose, cinematic lighting, 8k resolution, trending on artstation.
-        Aspect Ratio: 1:1 Square.
-        IMPORTANT: Do not generate any text, labels, numbers, or card stats in the image. Pure visual illustration only.
-    `;
+    try {
+        // Attempt 2: Text-to-Image (Fallback)
+        const fallbackPrompt = `
+            Create a masterpiece trading card illustration of a "${archetype}".
+            
+            ${basePrompt}
+            
+            Description:
+            An epic, powerful character representing a master of ${primaryLang}. 
+            They should look like a ${archetype}. 
+            Composition: Close-up Portrait, Head and Shoulders, Face clearly focused.
+            Dynamic pose, cinematic lighting, 8k resolution, trending on artstation.
+            Aspect Ratio: 1:1 Square.
+            IMPORTANT: Do not generate any text, labels, numbers, or card stats in the image. Pure visual illustration only.
+        `;
 
-    const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash-image',
-        contents: { parts: [{ text: fallbackPrompt }] },
-        config: { imageConfig: { aspectRatio: "1:1" } }
-    });
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.5-flash-image',
+            contents: { parts: [{ text: fallbackPrompt }] },
+            config: { imageConfig: { aspectRatio: "1:1" } }
+        });
 
-    const img = extractImageFromResponse(response);
-    if (img) return img;
+        const img = extractImageFromResponse(response);
+        if (img) return img;
+        
+        console.warn("Text-to-Image returned no image data, using fallback");
+    } catch (e: any) {
+        console.error("Text-to-Image generation failed:", e);
+        // Check if this is a quota error
+        const isQuotaError = e?.message?.includes('RESOURCE_EXHAUSTED') || 
+                            e?.status === 429 || 
+                            e?.statusCode === 429 ||
+                            e?.message?.includes('429');
+        if (isQuotaError) {
+            console.log(`Image generation quota exhausted for model gemini-2.5-flash-image; using avatarUrl fallback`);
+        }
+    }
+
+    // Final fallback: use avatarUrl if provided, otherwise throw
+    if (avatarUrl) {
+        console.log("Using GitHub avatar URL as final fallback");
+        return avatarUrl;
+    }
     
-    throw new Error("No image generated from either method");
+    throw new Error("No image generated from either method and no fallback avatar available");
 };
