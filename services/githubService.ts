@@ -59,9 +59,22 @@ export const summarizeRepoData = (repos: GithubRepo[]) => {
   const languages: Record<string, number> = {};
   let totalStars = 0;
   let totalForks = 0;
+  const topics = new Set<string>();
+  const repoNames: string[] = [];
+  const descriptions: string[] = [];
+  let originalRepoCount = 0;
 
   if (!repos || !Array.isArray(repos)) {
-      return { topLanguages: [], totalStars: 0, totalForks: 0, repoCount: 0 };
+      return { 
+        topLanguages: [], 
+        totalStars: 0, 
+        totalForks: 0, 
+        repoCount: 0,
+        allTopics: [],
+        repoNames: [],
+        repoDescriptions: [],
+        originalRepoCount: 0
+      };
   }
 
   repos.forEach(repo => {
@@ -70,6 +83,22 @@ export const summarizeRepoData = (repos: GithubRepo[]) => {
     }
     totalStars += repo.stargazers_count;
     totalForks += repo.forks_count;
+    
+    // Collect topics
+    if (repo.topics && Array.isArray(repo.topics)) {
+      repo.topics.forEach(topic => topics.add(topic));
+    }
+    
+    // Track original vs forked
+    if (!repo.fork) {
+      originalRepoCount++;
+    }
+    
+    // Collect repo names and descriptions for context
+    repoNames.push(repo.name);
+    if (repo.description) {
+      descriptions.push(repo.description);
+    }
   });
 
   const topLanguages = Object.entries(languages)
@@ -81,7 +110,11 @@ export const summarizeRepoData = (repos: GithubRepo[]) => {
     topLanguages,
     totalStars,
     totalForks,
-    repoCount: repos.length // of the sample
+    repoCount: repos.length,
+    allTopics: Array.from(topics).slice(0, 10), // Top 10 topics
+    repoNames: repoNames.slice(0, 5), // First 5 repo names
+    repoDescriptions: descriptions.slice(0, 3), // First 3 descriptions
+    originalRepoCount
   };
 };
 

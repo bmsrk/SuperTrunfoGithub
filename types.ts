@@ -8,6 +8,11 @@ export interface GithubUser {
   following: number;
   created_at: string;
   html_url: string;
+  location: string | null;
+  company: string | null;
+  twitter_username: string | null;
+  blog: string | null;
+  hireable: boolean | null;
 }
 
 export interface GithubRepo {
@@ -16,6 +21,9 @@ export interface GithubRepo {
   language: string | null;
   forks_count: number;
   updated_at: string;
+  description: string | null;
+  topics: string[];
+  fork: boolean;
 }
 
 export interface StatAttribute {

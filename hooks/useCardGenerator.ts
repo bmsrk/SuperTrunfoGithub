@@ -32,15 +32,29 @@ export const useCardGenerator = () => {
       let aiImageUrl: string | undefined = undefined;
       try {
           const imageData = await fetchImageAsBase64(user.avatar_url);
-          aiImageUrl = await generateCharacterImage(imageData, cardData.archetype, repoSummary.topLanguages[0] || 'Code', googleApiKey, user.avatar_url);
+          aiImageUrl = await generateCharacterImage(
+            imageData, 
+            cardData.archetype, 
+            repoSummary.topLanguages[0] || 'Code', 
+            user,
+            repoSummary.allTopics || [],
+            googleApiKey
+          );
       } catch (e) {
           console.warn("Failed to fetch/generate image, trying generation without source image...", e);
           try {
              // Fallback to text-only generation
-             aiImageUrl = await generateCharacterImage(null, cardData.archetype, repoSummary.topLanguages[0] || 'Code', googleApiKey, user.avatar_url);
+             aiImageUrl = await generateCharacterImage(
+               null, 
+               cardData.archetype, 
+               repoSummary.topLanguages[0] || 'Code',
+               user,
+               repoSummary.allTopics || [],
+               googleApiKey
+             );
           } catch (innerE) {
              console.warn("AI Image generation completely failed, will use GitHub avatar", innerE);
-             // Set to undefined to let Card component use GitHub avatar
+             // aiImageUrl stays undefined - Card component will use GitHub avatar without AI tag
              aiImageUrl = undefined;
           }
       }
