@@ -24,20 +24,18 @@ test.describe('API Key Optional Functionality', () => {
     await expect(page.getByRole('button', { name: /Create New/i })).toBeVisible();
   });
 
-  test('should show API key fields in settings', async ({ page }) => {
+  test('should show GitHub token field in settings', async ({ page }) => {
     await page.goto('/');
     
     // Click settings button to show API key fields
     const settingsButton = page.locator('button[title="Settings / API Keys"]');
     await settingsButton.click();
     
-    // Verify both API key fields are visible
+    // Verify GitHub token field is visible
     await expect(page.getByText('GITHUB TOKEN (OPTIONAL)')).toBeVisible();
-    await expect(page.getByText('GEMINI API KEY (OPTIONAL)')).toBeVisible();
     
-    // Verify the fields have placeholders
+    // Verify the field has placeholder
     await expect(page.getByPlaceholder('ghp_...')).toBeVisible();
-    await expect(page.getByPlaceholder('AIzaSy...')).toBeVisible();
   });
 
   test('should mark API keys as optional in UI', async ({ page }) => {

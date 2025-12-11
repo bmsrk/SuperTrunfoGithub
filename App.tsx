@@ -141,7 +141,7 @@ const App: React.FC = () => {
                 </div>
                 
                 <p className="text-zinc-500 text-xs font-mono mt-4 text-center">
-                   Generated with Gemini 2.5 • Developed by DevTrunfo<br/>
+                   Generated with local deterministic generator • Developed by DevTrunfo<br/>
                    <span className="text-zinc-600">made with love by </span>
                    <a href="https://x.com/enrichthesoil" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 transition-colors">
                      @enrichthesoil

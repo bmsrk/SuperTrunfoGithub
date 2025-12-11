@@ -1,20 +1,4 @@
 // Application configuration utilities
-// Note: This key is IP-restricted on Google Cloud Console to only work from GitHub Pages
-const k = 'QUl6YVN5QmtvNzVNWUd4UFBRUDhGZ3JGY2RoRDlSRzhQMTFILTBN';
-
-const d = (s: string): string => {
-  try {
-    return atob(s);
-  } catch {
-    return '';
-  }
-};
-
-export const getDefaultApiKey = (): string => d(k);
-
-export const getApiKey = (userProvidedKey?: string): string => {
-  if (userProvidedKey && userProvidedKey.trim()) {
-    return userProvidedKey.trim();
-  }
-  return getDefaultApiKey();
-};
+// No default API keys are embedded in the application.
+// Users must provide their own API keys if they want to use external AI services.
+// Without an external API key, the application uses a local deterministic generator.

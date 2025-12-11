@@ -2,7 +2,7 @@ import React, { useState, useEffect, memo } from 'react';
 import { Search, Github, Loader2, FlaskConical, Settings, Sparkles } from 'lucide-react';
 
 interface InputFormProps {
-  onSubmit: (username: string, githubToken?: string, googleApiKey?: string) => void;
+  onSubmit: (username: string, githubToken?: string) => void;
   onMock: () => void;
   isLoading: boolean;
 }
@@ -10,29 +10,22 @@ interface InputFormProps {
 export const InputForm: React.FC<InputFormProps> = memo(({ onSubmit, onMock, isLoading }) => {
   const [username, setUsername] = useState('');
   const [githubToken, setGithubToken] = useState('');
-  const [googleApiKey, setGoogleApiKey] = useState('');
   const [showSettings, setShowSettings] = useState(false);
 
-  // Load tokens from local storage on mount
+  // Load GitHub token from local storage on mount
   useEffect(() => {
     const savedGhToken = localStorage.getItem('github_token');
     if (savedGhToken) setGithubToken(savedGhToken);
-
-    const savedGoogleKey = localStorage.getItem('google_api_key');
-    if (savedGoogleKey) setGoogleApiKey(savedGoogleKey);
   }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (username.trim()) {
-      // Save tokens to local storage
+      // Save GitHub token to local storage
       if (githubToken.trim()) localStorage.setItem('github_token', githubToken.trim());
       else localStorage.removeItem('github_token');
 
-      if (googleApiKey.trim()) localStorage.setItem('google_api_key', googleApiKey.trim());
-      else localStorage.removeItem('google_api_key');
-
-      onSubmit(username.trim(), githubToken.trim(), googleApiKey.trim());
+      onSubmit(username.trim(), githubToken.trim());
     }
   };
 
@@ -60,15 +53,15 @@ export const InputForm: React.FC<InputFormProps> = memo(({ onSubmit, onMock, isL
         </button>
       </div>
 
-      {/* Info banner about AI features */}
-      <div className="bg-gradient-to-r from-purple-900/30 to-indigo-900/30 border border-purple-700/30 rounded-lg p-3 mb-4 relative z-10">
+      {/* Info banner about local generation */}
+      <div className="bg-gradient-to-r from-blue-900/30 to-cyan-900/30 border border-blue-700/30 rounded-lg p-3 mb-4 relative z-10">
         <div className="flex items-start gap-2">
-          <Sparkles size={16} className="text-purple-400 flex-shrink-0 mt-0.5" />
-          <div className="text-xs text-purple-200">
-            <p className="font-semibold mb-1">AI-Powered Features</p>
-            <p className="text-purple-300/90">
-              This app uses Google Gemini AI to generate unique character art and card stats. 
-              The default API key has limited quota. For unlimited usage, add your own Gemini API key in settings.
+          <Sparkles size={16} className="text-blue-400 flex-shrink-0 mt-0.5" />
+          <div className="text-xs text-blue-200">
+            <p className="font-semibold mb-1">Local Generation</p>
+            <p className="text-blue-300/90">
+              This app uses a deterministic local generator to create unique cards based on your GitHub profile.
+              No external API keys required!
             </p>
           </div>
         </div>
@@ -77,8 +70,8 @@ export const InputForm: React.FC<InputFormProps> = memo(({ onSubmit, onMock, isL
       <form onSubmit={handleSubmit} className="flex flex-col gap-4 relative z-10">
         
         {/* Settings / API Keys (Collapsible) */}
-        <div className={`overflow-hidden transition-all duration-300 ease-in-out ${showSettings ? 'max-h-52 opacity-100 mb-2' : 'max-h-0 opacity-0'}`}>
-            <div className="bg-zinc-950/50 rounded-lg p-3 border border-zinc-800 flex flex-col gap-3">
+        <div className={`overflow-hidden transition-all duration-300 ease-in-out ${showSettings ? 'max-h-32 opacity-100 mb-2' : 'max-h-0 opacity-0'}`}>
+            <div className="bg-zinc-950/50 rounded-lg p-3 border border-zinc-800">
                 {/* GitHub Token */}
                 <div>
                     <label className="text-[10px] text-zinc-400 font-mono mb-1 flex items-center gap-1">
@@ -92,24 +85,7 @@ export const InputForm: React.FC<InputFormProps> = memo(({ onSubmit, onMock, isL
                         className="w-full bg-transparent border-b border-zinc-700 text-zinc-300 text-xs focus:outline-none focus:border-yellow-500 px-0 py-1 placeholder-zinc-700 transition-colors"
                     />
                     <p className="text-[9px] text-zinc-600 mt-1">
-                        Increases GitHub API rate limits.
-                    </p>
-                </div>
-
-                {/* Google API Key */}
-                <div>
-                    <label className="text-[10px] text-zinc-400 font-mono mb-1 flex items-center gap-1">
-                        <Sparkles size={10} /> GEMINI API KEY (OPTIONAL)
-                    </label>
-                    <input
-                        type="password"
-                        value={googleApiKey}
-                        onChange={(e) => setGoogleApiKey(e.target.value)}
-                        placeholder="AIzaSy..."
-                        className="w-full bg-transparent border-b border-zinc-700 text-zinc-300 text-xs focus:outline-none focus:border-purple-500 px-0 py-1 placeholder-zinc-700 transition-colors"
-                    />
-                    <p className="text-[9px] text-zinc-600 mt-1">
-                        A default key is provided but has limited quota. Add your own for unlimited AI generation.
+                        Increases GitHub API rate limits (60/hour → 5000/hour).
                     </p>
                 </div>
             </div>

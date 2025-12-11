@@ -1,9 +1,77 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { GithubUser, CardData } from '../types';
-import { getApiKey } from '../utils/config';
 
-// Fallback function to generate basic card data without AI
-export const generateBasicCardData = (
+// ============================================================================
+// DETERMINISTIC LOCAL GENERATOR (NO EXTERNAL API REQUIRED)
+// ============================================================================
+
+/**
+ * djb2 hash function - creates a deterministic integer from a string
+ * This is a simple, fast hash function suitable for seeding PRNGs
+ */
+function djb2Hash(str: string): number {
+  let hash = 5381;
+  for (let i = 0; i < str.length; i++) {
+    hash = ((hash << 5) + hash) + str.charCodeAt(i); // hash * 33 + c
+  }
+  return Math.abs(hash);
+}
+
+/**
+ * Mulberry32 PRNG - deterministic pseudo-random number generator
+ * Given the same seed, it will always produce the same sequence of numbers
+ */
+function createSeededRandom(seed: number) {
+  return function() {
+    let t = seed += 0x6D2B79F5;
+    t = Math.imul(t ^ t >>> 15, t | 1);
+    t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+
+/**
+ * Weighted random choice - selects an item based on weights using deterministic RNG
+ */
+function weightedChoice<T>(items: T[], weights: number[], rng: () => number): T {
+  const totalWeight = weights.reduce((sum, w) => sum + w, 0);
+  let random = rng() * totalWeight;
+  
+  for (let i = 0; i < items.length; i++) {
+    random -= weights[i];
+    if (random <= 0) {
+      return items[i];
+    }
+  }
+  return items[items.length - 1];
+}
+
+/**
+ * Normalize a value to 1-100 range using logarithmic scaling
+ */
+function normalizeToRange(value: number, min: number, max: number, variance: number = 0): number {
+  if (value <= 0) return Math.max(1, Math.floor(1 + variance));
+  
+  // Use log scale for better distribution
+  const logValue = Math.log10(value + 1);
+  const logMax = Math.log10(max + 1);
+  const logMin = Math.log10(min + 1);
+  
+  const normalized = ((logValue - logMin) / (logMax - logMin)) * 99 + 1;
+  const result = Math.min(100, Math.max(1, Math.floor(normalized + variance)));
+  
+  return result;
+}
+
+/**
+ * Deterministic local card stats generator
+ * Uses GitHub data to create a unique fingerprint and generates consistent results
+ * 
+ * @param user - GitHub user profile
+ * @param repoSummary - Repository summary data
+ * @returns CardData with deterministic stats
+ */
+export const generateLocalCardStats = (
   user: GithubUser,
   repoSummary: { 
     topLanguages: string[], 
@@ -16,62 +84,172 @@ export const generateBasicCardData = (
     originalRepoCount: number
   }
 ): CardData => {
-  const accountAge = new Date().getFullYear() - new Date(user.created_at).getFullYear();
-  const estimatedCommits = user.public_repos * 50 + accountAge * 300;
+  // Create a unique fingerprint from user data
+  const topLangs = repoSummary.topLanguages.slice(0, 3).join(',');
+  const topTopics = repoSummary.allTopics.slice(0, 6).join(',');
+  const fingerprint = `${user.login}|${user.public_repos}|${repoSummary.totalStars}|${user.followers}|${topLangs}|${topTopics}`;
   
-  // Determine archetype based on top language
+  // Generate deterministic seed from fingerprint
+  const seed = djb2Hash(fingerprint);
+  const rng = createSeededRandom(seed);
+  
+  // Calculate metrics
+  const accountAge = Math.max(1, new Date().getFullYear() - new Date(user.created_at).getFullYear());
+  const estimatedCommits = user.public_repos * 60 + accountAge * 400 + repoSummary.totalStars * 2 + repoSummary.originalRepoCount * 30;
+  
+  // Normalize stats with small deterministic variance
+  const reposNorm = normalizeToRange(user.public_repos, 0, 500, (rng() - 0.5) * 10);
+  const starsNorm = normalizeToRange(repoSummary.totalStars, 0, 5000, (rng() - 0.5) * 10);
+  const followersNorm = normalizeToRange(user.followers, 0, 1000, (rng() - 0.5) * 10);
+  const commitsNorm = normalizeToRange(estimatedCommits, 0, 50000, (rng() - 0.5) * 10);
+  
+  // Keep raw values for display but use normalized for comparisons
+  const stats = [
+    { label: 'Repositórios', value: user.public_repos, normalized: reposNorm },
+    { label: 'Estrelas', value: repoSummary.totalStars, normalized: starsNorm },
+    { label: 'Seguidores', value: user.followers, normalized: followersNorm },
+    { label: 'Commits', value: estimatedCommits, unit: '+', normalized: commitsNorm }
+  ];
+  
+  // Select trump based on highest normalized stat with small chance of randomness
+  const maxStat = rng() > 0.9 
+    ? stats[Math.floor(rng() * stats.length)]
+    : stats.reduce((max, stat) => (stat.normalized || 0) > (max.normalized || 0) ? stat : max, stats[0]);
+  
+  // Archetype selection based on heuristics
   const topLang = repoSummary.topLanguages[0] || 'Code';
-  const archetypes: Record<string, string> = {
-    'JavaScript': 'Frontend Alchemist',
-    'TypeScript': 'Type-Safe Paladin',
-    'Python': 'Data Sorcerer',
-    'Java': 'Enterprise Architect',
-    'Go': 'Concurrency Master',
-    'Rust': 'Memory Guardian',
-    'C++': 'Performance Ninja',
-    'C#': 'Framework Wizard',
-    'Ruby': 'Rails Conductor',
-    'PHP': 'Web Craftsman',
+  const hasLocation = !!user.location;
+  const hasCompany = !!user.company;
+  const isProlific = user.public_repos > 30;
+  const isPopular = user.followers > 100;
+  
+  // Language-based archetype base
+  const langArchetypes: Record<string, string[]> = {
+    'JavaScript': ['Frontend Alchemist', 'Script Sorcerer', 'Web Enchanter'],
+    'TypeScript': ['Type-Safe Paladin', 'Interface Guardian', 'Typed Warrior'],
+    'Python': ['Data Sorcerer', 'Script Wizard', 'Algorithm Sage'],
+    'Java': ['Enterprise Architect', 'JVM Titan', 'Bean Master'],
+    'Go': ['Concurrency Master', 'Goroutine Shepherd', 'Cloud Native'],
+    'Rust': ['Memory Guardian', 'Safe Code Sentinel', 'Systems Artisan'],
+    'C++': ['Performance Ninja', 'Low-Level Samurai', 'Cache Optimizer'],
+    'C#': ['Framework Wizard', 'LINQ Sorcerer', '.NET Architect'],
+    'Ruby': ['Rails Conductor', 'Gem Curator', 'Meta-Programming Mage'],
+    'PHP': ['Web Craftsman', 'Server-Side Sage', 'Dynamic Weaver'],
+    'Swift': ['iOS Architect', 'SwiftUI Master', 'Apple Ecosystem Lord'],
+    'Kotlin': ['Android Artisan', 'Coroutine Commander', 'JetBrains Virtuoso'],
+    'Dart': ['Flutter Champion', 'Widget Wizard', 'Cross-Platform Sage'],
+    'R': ['Statistical Sage', 'Data Visualizer', 'Research Wizard'],
+    'Shell': ['Terminal Virtuoso', 'Script Automator', 'CLI Champion']
   };
   
-  const archetype = archetypes[topLang] || `${topLang} Developer`;
+  const archetypeOptions = langArchetypes[topLang] || [`${topLang} Developer`, `${topLang} Expert`, `${topLang} Master`];
   
-  // Generate a simple description
-  const descriptions = [
-    'Commits code with precision and style.',
-    'Turns coffee into code.',
-    'Debugging is their superpower.',
-    'Writes clean code while others sleep.',
-    'The architect of elegant solutions.',
-  ];
-  const description = descriptions[Math.floor(Math.random() * descriptions.length)];
+  // Weight archetypes based on user profile
+  let weights = [1, 1, 1];
+  if (isProlific) weights[0] *= 1.5;
+  if (isPopular) weights[1] *= 1.5;
+  if (hasCompany || hasLocation) weights[2] *= 1.5;
   
-  // Determine which stat is the trump
-  const stats = [
-    { label: 'Repositórios', value: user.public_repos },
-    { label: 'Estrelas', value: repoSummary.totalStars },
-    { label: 'Seguidores', value: user.followers },
-    { label: 'Commits', value: estimatedCommits, unit: '+' }
-  ];
+  const archetype = weightedChoice(archetypeOptions, weights, rng);
   
-  // Find the highest stat for trump
-  const maxStat = stats.reduce((max, stat) => stat.value > max.value ? stat : max, stats[0]);
+  // Generate description based on real data
+  const descriptionParts: string[] = [];
   
-  // Generate special abilities based on stats
-  const abilities = [
-    { name: 'Git Push --force', description: 'Dobra o valor de Commits se for o atributo escolhido.' },
-    { name: 'Merge Master', description: 'Ganha automaticamente se o oponente tiver menos repositórios.' },
-    { name: 'Code Review', description: 'Anula o trunfo do oponente se tiver mais estrelas.' },
-    { name: 'Sudo Deploy', description: 'Troca o valor de Seguidores com o oponente.' },
-  ];
-  const specialAbility = abilities[Math.floor(Math.random() * abilities.length)];
+  if (user.bio && user.bio.length > 10) {
+    descriptionParts.push(`"${user.bio.substring(0, 50)}${user.bio.length > 50 ? '...' : ''}"`);
+  }
+  
+  if (user.location) {
+    descriptionParts.push(`De ${user.location}`);
+  }
+  
+  if (repoSummary.totalStars > 100) {
+    descriptionParts.push(`${repoSummary.totalStars}⭐ conquistadas`);
+  }
+  
+  if (user.followers > 50) {
+    descriptionParts.push(`${user.followers} seguidores`);
+  }
+  
+  if (isProlific) {
+    descriptionParts.push(`${user.public_repos} repositórios`);
+  }
+  
+  if (repoSummary.allTopics.length > 0) {
+    const topic = repoSummary.allTopics[Math.floor(rng() * Math.min(3, repoSummary.allTopics.length))];
+    descriptionParts.push(`especialista em ${topic}`);
+  }
+  
+  const description = descriptionParts.length > 0 
+    ? descriptionParts.slice(0, 3).join('. ') + '.'
+    : `Desenvolvedor ${topLang} com ${accountAge} anos de experiência no GitHub.`;
+  
+  // Special ability based on profile and highest stat
+  const abilityOptions: Array<{name: string, description: string, weight: number}> = [];
+  
+  if (topLang === 'Python' || repoSummary.allTopics.some(t => t.includes('machine-learning') || t.includes('data'))) {
+    abilityOptions.push({
+      name: 'Neural Net Deploy',
+      description: `Multiplica Commits por ${Math.ceil(rng() * 2 + 1)} se for o trunfo.`,
+      weight: 2
+    });
+  }
+  
+  if (topLang === 'JavaScript' || topLang === 'TypeScript' || repoSummary.allTopics.some(t => t.includes('react') || t.includes('frontend'))) {
+    abilityOptions.push({
+      name: 'Virtual DOM Storm',
+      description: `Adiciona ${Math.floor(rng() * 20 + 10)} pontos a Estrelas.`,
+      weight: 2
+    });
+  }
+  
+  if (repoSummary.totalStars > 500) {
+    abilityOptions.push({
+      name: 'Open Source Legend',
+      description: 'Dobra o valor de Estrelas se for o trunfo.',
+      weight: 3
+    });
+  }
+  
+  if (user.followers > 200) {
+    abilityOptions.push({
+      name: 'Community Magnet',
+      description: 'Ganha automaticamente se Seguidores for maior que o oponente.',
+      weight: 3
+    });
+  }
+  
+  if (hasCompany) {
+    abilityOptions.push({
+      name: 'Enterprise Power',
+      description: 'Anula habilidades especiais de oponentes com menos repositórios.',
+      weight: 2
+    });
+  }
+  
+  // Default abilities
+  abilityOptions.push(
+    { name: 'Git Push --force', description: 'Dobra o valor de Commits se for o trunfo.', weight: 1 },
+    { name: 'Merge Master', description: 'Ganha se tiver mais repositórios que o oponente.', weight: 1 },
+    { name: 'Code Review Pro', description: 'Anula o trunfo do oponente se tiver mais estrelas.', weight: 1 },
+    { name: 'Sudo Deploy', description: 'Troca valores de Seguidores com o oponente.', weight: 1 }
+  );
+  
+  const specialAbility = weightedChoice(
+    abilityOptions,
+    abilityOptions.map(a => a.weight),
+    rng
+  );
+  
+  // Generate ID deterministically
+  const idNum = (seed % 99) + 1;
   
   return {
-    id: `DEV-${Math.floor(Math.random() * 100).toString().padStart(2, '0')}`,
+    id: `DEV-${idNum.toString().padStart(2, '0')}`,
     archetype,
     description,
-    stats,
-    specialAbility,
+    stats: stats.map(({ normalized, ...rest }) => rest), // Remove normalized from output
+    specialAbility: { name: specialAbility.name, description: specialAbility.description },
     superTrunfoAttribute: maxStat.label
   };
 };
@@ -111,15 +289,6 @@ const POWER_ELEMENTS = [
     "typing rapidly on a holographic interface that surrounds them"
 ];
 
-const getAi = (apiKey?: string) => {
-    try {
-        const key = getApiKey(apiKey);
-        return new GoogleGenAI({ apiKey: key });
-    } catch (error) {
-        throw new Error("Failed to initialize AI service. If the default API quota is exceeded, please add your own Gemini API key in settings.");
-    }
-};
-
 const extractImageFromResponse = (response: any): string | null => {
     console.debug("Extracting image from AI response:", JSON.stringify(response, null, 2));
     for (const candidate of response.candidates || []) {
@@ -146,7 +315,20 @@ export const generateCardStats = async (
   },
   apiKey?: string
 ): Promise<CardData> => {
-  const ai = getAi(apiKey);
+  // If no API key is provided, use the local deterministic generator
+  if (!apiKey || !apiKey.trim()) {
+    console.log('No external API key provided - using local deterministic generator');
+    return generateLocalCardStats(user, repoSummary);
+  }
+
+  // Try to use external AI service with the provided key
+  let ai;
+  try {
+    ai = new GoogleGenAI({ apiKey: apiKey.trim() });
+  } catch (error) {
+    console.warn('Failed to initialize AI service, falling back to local generator:', error);
+    return generateLocalCardStats(user, repoSummary);
+  }
   
   // Extract insights from user profile
   const accountAge = new Date().getFullYear() - new Date(user.created_at).getFullYear();
@@ -304,10 +486,16 @@ export const generateCardStats = async (
   });
 
   if (!response.text) {
-    throw new Error("Failed to generate card data");
+    console.warn('AI service returned no text, falling back to local generator');
+    return generateLocalCardStats(user, repoSummary);
   }
 
-  return JSON.parse(response.text) as CardData;
+  try {
+    return JSON.parse(response.text) as CardData;
+  } catch (error) {
+    console.warn('Failed to parse AI response, falling back to local generator:', error);
+    return generateLocalCardStats(user, repoSummary);
+  }
 };
 
 export const generateCharacterImage = async (
@@ -317,8 +505,20 @@ export const generateCharacterImage = async (
     user: GithubUser,
     topics: string[],
     apiKey?: string
-): Promise<string> => {
-    const ai = getAi(apiKey);
+): Promise<string | undefined> => {
+    // Only attempt AI image generation if an external API key is explicitly provided
+    if (!apiKey || !apiKey.trim()) {
+        console.log('No external API key provided - skipping AI image generation');
+        return undefined;
+    }
+
+    let ai;
+    try {
+        ai = new GoogleGenAI({ apiKey: apiKey.trim() });
+    } catch (error) {
+        console.warn('Failed to initialize AI service for image generation:', error);
+        return undefined;
+    }
     
     // Select random elements from static arrays
     const randomStyle = ART_STYLES[Math.floor(Math.random() * ART_STYLES.length)];
@@ -475,6 +675,7 @@ export const generateCharacterImage = async (
         }
     }
 
-    // If we reach here, AI generation failed - throw to signal no AI image available
-    throw new Error("AI image generation failed - will use GitHub avatar fallback");
+    // If we reach here, AI generation failed - return undefined to signal no AI image available
+    console.warn("AI image generation failed - will use GitHub avatar fallback");
+    return undefined;
 };

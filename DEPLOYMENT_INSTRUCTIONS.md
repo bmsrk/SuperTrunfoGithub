@@ -35,29 +35,6 @@ The first deployment may take 2-5 minutes.
 
 ---
 
-## Optional: Add Gemini API Key for Server-Side Builds
-
-If you want the API key available during build time (not required), you can add it as a GitHub secret:
-
-1. Go to **Settings** → **Secrets and variables** → **Actions**
-2. Click **New repository secret**
-3. Name: `API_KEY`
-4. Value: Your Gemini API key
-5. Click **Add secret**
-
-Then update the workflow file to pass the secret:
-
-```yaml
-- name: Build
-  run: npm run build
-  env:
-    API_KEY: ${{ secrets.API_KEY }}
-```
-
-**Note:** This is optional. Users can also provide their own API key through the UI.
-
----
-
 ## Running Tests Locally
 
 Before deploying, it's recommended to run tests locally to ensure everything works:

@@ -1,5 +1,5 @@
 {
   "name": "DevTrunfo - GitHub Battle Cards",
-  "description": "Generate custom Super Trunfo trading cards based on GitHub profiles using Gemini AI analysis.",
+  "description": "Generate custom Super Trunfo trading cards based on GitHub profiles using a deterministic local generator. No external API keys required!",
   "requestFramePermissions": []
 }
