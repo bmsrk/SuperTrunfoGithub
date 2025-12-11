@@ -223,8 +223,9 @@ export const generateLocalCardStats = (
   };
   
   const archetypeOptions = langArchetypes[topLang] || [
-    `${topLang} Code Craftsman`, `${topLang} Digital Architect`, `${topLang} Syntax Sorcerer`,
-    `${topLang} Framework Fanatic`, `${topLang} Pattern Practitioner`
+    'Code Craftsman', 'Digital Architect', 'Syntax Sorcerer',
+    'Framework Fanatic', 'Pattern Practitioner', 'Full-Stack Virtuoso',
+    'Polyglot Developer'
   ];
   
   // Weight archetypes based on user profile - more nuanced weighting

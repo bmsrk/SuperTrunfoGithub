@@ -165,8 +165,9 @@ describe('geminiService', () => {
       const emptyRepoSummary = { ...mockRepoSummary, topLanguages: [] };
       const result = generateLocalCardStats(mockUser, emptyRepoSummary);
       const validArchetypes = [
-        'Code Code Craftsman', 'Code Digital Architect', 'Code Syntax Sorcerer',
-        'Code Framework Fanatic', 'Code Pattern Practitioner'
+        'Code Craftsman', 'Digital Architect', 'Syntax Sorcerer',
+        'Framework Fanatic', 'Pattern Practitioner', 'Full-Stack Virtuoso',
+        'Polyglot Developer'
       ];
       expect(validArchetypes).toContain(result.archetype);
     });
