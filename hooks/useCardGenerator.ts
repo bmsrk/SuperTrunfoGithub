@@ -21,10 +21,14 @@ export const useCardGenerator = () => {
 
       // 2. Generate Stats - Always try AI generation (uses default key if none provided)
       let cardData;
+      let geminiApiFailed = false;
+      let geminiErrorMessage = '';
       try {
         cardData = await generateCardStats(user, repoSummary, googleApiKey);
-      } catch (err) {
+      } catch (err: any) {
         console.warn("AI card generation failed, using basic generation", err);
+        geminiApiFailed = true;
+        geminiErrorMessage = err.message || 'Gemini API error';
         cardData = generateBasicCardData(user, repoSummary);
       }
       
@@ -60,6 +64,11 @@ export const useCardGenerator = () => {
       }
 
       setProfile({ user, cardData, aiImageUrl });
+
+      // If Gemini API failed, show a warning to the user
+      if (geminiApiFailed) {
+        setError(`⚠️ Gemini API falhou: ${geminiErrorMessage}. Usando geração básica de dados. ${!googleApiKey ? 'Considere adicionar sua própria chave API do Gemini nas configurações para acesso ilimitado.' : ''}`);
+      }
 
     } catch (err: any) {
       setError(err.message || 'Something went wrong. Please check the username.');

@@ -179,7 +179,11 @@ export const generateCardStats = async (
   const prompt = `
     Aja como um gerador CRIATIVO de cartas para o jogo "Super Trunfo" edição Desenvolvedores.
     Analise profundamente o perfil GitHub abaixo e FAÇA SUPOSIÇÕES OUSADAS sobre a personalidade e estilo do desenvolvedor.
-    Seja ESPECÍFICO e evite clichês genéricos. Use o contexto completo para criar uma carta ÚNICA.
+    
+    REGRA CRÍTICA: NUNCA use frases ou termos genéricos como "commits code with precision", "turns coffee into code", 
+    "debugging is their superpower", "writes clean code", "architect of elegant solutions", etc.
+    
+    SEJA EXTREMAMENTE ESPECÍFICO usando os dados reais fornecidos abaixo.
 
     Perfil do Usuário:
     - Username: ${user.login}
@@ -196,7 +200,7 @@ export const generateCardStats = async (
     - Total Estrelas: ${repoSummary.totalStars}
     - Total Forks: ${repoSummary.totalForks}
 
-    ANÁLISE DE PERSONALIDADE (Use isto para criar o archetype e description):
+    ANÁLISE DE PERSONALIDADE (Use isto OBRIGATORIAMENTE para criar o archetype e description):
     ${hasStrongBio ? '- Perfil bem documentado, provavelmente comunicativo e atento a detalhes' : '- Perfil minimalista, deixa o código falar por si'}
     ${isPopular ? '- Reconhecido pela comunidade, líder de opinião' : '- Foca no trabalho, não na fama'}
     ${isProlific ? '- Extremamente produtivo, provavelmente trabalha em múltiplos projetos' : '- Foca em qualidade sobre quantidade'}
@@ -206,18 +210,31 @@ export const generateCardStats = async (
 
     REQUISITOS OBRIGATÓRIOS DE SAÍDA (JSON):
 
-    1. 'archetype': Crie uma classe de RPG ÚNICA e ESPECÍFICA. NÃO use termos genéricos.
-       - Combine a linguagem principal com personalidade inferida e contexto geográfico/cultural
-       - Exemplos: "${user.location?.includes('Brasil') ? 'Capoeirista do React' : 'Samurai do TypeScript'}", "Alquimista ${repoSummary.allTopics[0] || 'de Código'}", "${user.company ? 'Arquiteto Corporativo' : 'Hacker Nômade'} de ${repoSummary.topLanguages[0] || 'Multi-Stack'}"
-       - Se o usuário tem repos sobre ML/AI/Data, use termos como "Cientista de Dados", "Bruxo de IA", etc.
-       - Se é full-stack (múltiplas linguagens), destaque isso: "Polímata Full-Stack", "Mestre dos Mil Frameworks"
+    1. 'archetype': Crie uma classe de RPG ÚNICA e ESPECÍFICA baseada nos dados REAIS acima. 
+       PROIBIDO usar apenas o nome da linguagem. Você DEVE mesclar múltiplos aspectos:
+       - Se tem localização: incorpore elemento cultural (ex: "Capoeirista do React", "Samurai TypeScript")
+       - Se tem tópicos específicos: use-os (ex: "Alquimista de ${repoSummary.allTopics[0] || 'APIs'}")
+       - Se trabalha em empresa: mencione contexto (ex: "Arquiteto ${user.company} de ${repoSummary.topLanguages[0]}")
+       - Se tem muitos repos: "Polímata", "Mestre Multi-Stack"
+       - Se ML/AI/Data Science: "Cientista", "Bruxo", "Mago da IA", "Domador de Dados"
+       - COMBINE múltiplos elementos: localização + tecnologia + personalidade
+       
+       EXEMPLOS ESPECÍFICOS OBRIGATÓRIOS para ${user.login}:
+       - Se brasileiro + React: "Capoeirista do React", "Sambista Full-Stack"
+       - Se japonês + qualquer tech: "Samurai de ${repoSummary.topLanguages[0] || 'Código'}"
+       - Se europeu + Python: "Alquimista Europeu de Dados"
+       - Se company like Google/Meta/etc: "Titã ${user.company} de ${repoSummary.topLanguages[0]}"
     
-    2. 'description': Uma frase de efeito PERSONALIZADA que referencia:
-       - Bio do usuário (se existir e for relevante)
-       - Localização ou empresa (se disponível)
-       - Tópicos ou nomes de projetos específicos
-       - Personalidade inferida
-       Exemplo: "${user.bio?.substring(0, 50)}..." ou "De ${user.location || 'algum lugar do mundo'}, ${isProlific ? 'cria projetos como respira' : 'aperfeiçoa cada linha de código'}."
+    2. 'description': OBRIGATÓRIO referenciar DADOS ESPECÍFICOS REAIS do perfil:
+       - Se tem BIO: use parte dela literalmente: "${user.bio ? `"${user.bio.substring(0, 60)}..."` : ''}"
+       - Se tem LOCALIZAÇÃO: mencione explicitamente: "De ${user.location || ''}"
+       - Se tem EMPRESA: mencione: "Em ${user.company || ''}"
+       - Se tem TÓPICOS: referencie: "Especialista em ${repoSummary.allTopics.slice(0, 2).join(' e ') || ''}"
+       - Se tem PROJETOS: cite nome de projeto: "Criador de ${repoSummary.repoNames[0] || ''}"
+       - Combine com números reais: "${user.followers} seguidores", "${repoSummary.totalStars} estrelas"
+       
+       PROIBIDO: frases vagas como "cria projetos", "código elegante", "desenvolve com paixão"
+       OBRIGATÓRIO: frases com NOMES, NÚMEROS, LUGARES específicos do perfil
     
     3. 'stats': Array com exatamente 4 atributos OBRIGATÓRIOS.
        - Use estes nomes exatos: 'Repositórios', 'Estrelas', 'Seguidores', 'Commits'.
@@ -228,18 +245,23 @@ export const generateCardStats = async (
     
     4. 'superTrunfoAttribute': Escolha o atributo numérico mais impressionante para ser o trunfo.
     
-    5. 'specialAbility': Um objeto com 'name' e 'description'.
-       - O NOME deve ser ESPECÍFICO ao perfil: 
-         * Se usa Python/Data: "DataFrame Overflow", "Neural Net Deploy"
-         * Se usa React/Frontend: "Virtual DOM Mastery", "Component Tree Fury"
-         * Se tem muitas estrelas: "Open Source Legend", "Community Magnet"
-         * Se de empresa grande: "Enterprise Architect", "Scrum Sprint Lord"
-         * Se localização específica: incorpore referências culturais sutis
-       - A descrição deve ser criativa e relevante ao jogo.
+    5. 'specialAbility': Um objeto com 'name' e 'description' ESPECÍFICOS ao perfil.
+       O NOME deve referenciar dados reais:
+         * Se Python/Jupyter/Data Science: "DataFrame Overflow", "Neural Net ${repoSummary.totalStars > 100 ? 'Master' : 'Deploy'}"
+         * Se React/Vue/Frontend: "Virtual DOM ${isProlific ? 'Storm' : 'Mastery'}", "Component Tree ${user.followers > 100 ? 'Legend' : 'Fury'}"
+         * Se tem muitas estrelas (>500): "Open Source ${repoSummary.totalStars > 1000 ? 'Titan' : 'Legend'}", "Community ${user.followers > 500 ? 'Icon' : 'Magnet'}"
+         * Se empresa grande (Google, Meta, etc): "Enterprise ${user.company} Power", "Scrum Sprint ${isProlific ? 'God' : 'Lord'}"
+         * Se localização específica: incorpore cultura local (Brasil: "Jeitinho Brasileiro", Japão: "Bushido Code")
+       A descrição deve usar números reais: "Multiplica Commits por ${Math.floor(user.public_repos / 10)} se for o trunfo"
     
     6. 'id': Gere um código como "DEV-XX" onde XX é um número entre 01-99.
 
-    IMPORTANTE: Faça a carta DIFERENTE de outras. Use TODOS os detalhes disponíveis. Seja OUSADO nas suposições sobre personalidade.
+    INSTRUÇÕES FINAIS CRÍTICAS:
+    - Você DEVE mencionar pelo menos 3 dados específicos reais (nome de projeto, localização, empresa, tópico, número de stars/followers, etc)
+    - Você ESTÁ PROIBIDO de usar frases genéricas que poderiam se aplicar a qualquer desenvolvedor
+    - Cada carta DEVE ser absolutamente única baseada nos dados fornecidos
+    - Se não houver dados suficientes, faça suposições ousadas mas específicas baseadas no que existe
+    
     Responda APENAS com o JSON válido seguindo o schema.
   `;
 
