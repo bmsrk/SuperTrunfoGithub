@@ -13,18 +13,18 @@ test.describe('Edge Cases and Error Handling', () => {
     await expect(usernameInput).toHaveValue(veryLongUsername);
   });
 
-  test('should handle special characters in settings inputs', async ({ page }) => {
+  test('should handle special characters in GitHub token input', async ({ page }) => {
     await page.goto('/');
     
     // Open settings
     const settingsButton = page.locator('button[title="Settings / API Keys"]');
     await settingsButton.click();
     
-    // Try special characters in API key
-    const geminiKeyInput = page.getByPlaceholder('AIzaSy...');
-    await geminiKeyInput.fill('test-key-with-special-!@#$%^&*()');
+    // Try special characters in GitHub token
+    const githubTokenInput = page.getByPlaceholder('ghp_...');
+    await githubTokenInput.fill('ghp_test-token-with-special-chars');
     
-    await expect(geminiKeyInput).toHaveValue('test-key-with-special-!@#$%^&*()');
+    await expect(githubTokenInput).toHaveValue('ghp_test-token-with-special-chars');
   });
 
   test('should persist after settings panel toggle', async ({ page }) => {
@@ -123,22 +123,19 @@ test.describe('Edge Cases and Error Handling', () => {
     await expect(usernameInput).toHaveValue('');
   });
 
-  test('should have settings panel with both input fields', async ({ page }) => {
+  test('should have settings panel with GitHub token field', async ({ page }) => {
     await page.goto('/');
     
     const settingsButton = page.locator('button[title="Settings / API Keys"]');
     await settingsButton.click();
     
-    // Check both fields exist
+    // Check GitHub token field exists
     const githubTokenInput = page.getByPlaceholder('ghp_...');
-    const geminiKeyInput = page.getByPlaceholder('AIzaSy...');
     
     await expect(githubTokenInput).toBeVisible();
-    await expect(geminiKeyInput).toBeVisible();
     
-    // Check labels
+    // Check label
     await expect(page.getByText('GITHUB TOKEN (OPTIONAL)')).toBeVisible();
-    await expect(page.getByText('GEMINI API KEY (OPTIONAL)')).toBeVisible();
   });
 
   test('should maintain button visibility in card view', async ({ page }) => {

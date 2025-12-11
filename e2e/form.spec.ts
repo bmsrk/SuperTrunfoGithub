@@ -33,7 +33,6 @@ test.describe('Form Validation', () => {
     
     // Settings should be visible
     await expect(page.getByText('GITHUB TOKEN (OPTIONAL)')).toBeVisible();
-    await expect(page.getByText('GEMINI API KEY (OPTIONAL)')).toBeVisible();
     
     // Verify input fields are accessible
     const githubTokenInput = page.getByPlaceholder('ghp_...');
@@ -50,7 +49,7 @@ test.describe('Form Validation', () => {
     await expect(usernameInput).toHaveValue('octocat');
   });
 
-  test('should accept input in API key fields', async ({ page }) => {
+  test('should accept input in GitHub token field', async ({ page }) => {
     await page.goto('/');
     
     // Open settings
@@ -61,10 +60,5 @@ test.describe('Form Validation', () => {
     const githubTokenInput = page.getByPlaceholder('ghp_...');
     await githubTokenInput.fill('test_token_123');
     await expect(githubTokenInput).toHaveValue('test_token_123');
-    
-    // Fill Gemini API key
-    const geminiKeyInput = page.getByPlaceholder('AIzaSy...');
-    await geminiKeyInput.fill('test_api_key_456');
-    await expect(geminiKeyInput).toHaveValue('test_api_key_456');
   });
 });

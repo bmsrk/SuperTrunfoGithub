@@ -96,15 +96,17 @@
    - Calculates statistics automatically
    - Supports optional GitHub token for higher rate limits
 
-2. **AI-Powered Card Generation**
-   - Uses Google Gemini AI to generate card stats and abilities
-   - Creates unique character art via image generation
-   - Falls back gracefully if AI features are unavailable
+2. **Local Deterministic Card Generation**
+   - Uses a deterministic local generator to create card stats and abilities
+   - No external API keys required or embedded
+   - Same profile always generates the same card
+   - Privacy-first approach with all processing in the browser
 
 3. **Interactive Card Display**
    - 3D holographic card effects
    - Mouse tracking and parallax effects
    - High-quality visual design
+   - Uses GitHub avatar for profile images
 
 4. **Download Functionality**
    - Export cards as high-resolution PNG images
@@ -114,9 +116,10 @@
 ### User Experience
 - ✅ Clean, modern UI with dark theme
 - ✅ Loading states and error handling
-- ✅ Settings panel for API key configuration
+- ✅ Settings panel for GitHub token (optional)
 - ✅ Mock data for testing
 - ✅ Responsive design (mobile-friendly)
+- ✅ No external API dependencies
 
 ---
 
@@ -157,10 +160,10 @@ This uses `gh-pages` package to build and push to the `gh-pages` branch.
    - Source: "GitHub Actions"
    - No other configuration needed (workflow handles everything)
 
-2. **Set up API Key** (Optional but recommended):
-   - Get a Gemini API key from Google AI Studio
-   - Add as repository secret named `API_KEY` for the GitHub Actions workflow
-   - Note: App works without this, but rate limits may be hit
+2. **No API Keys Required**:
+   - The app uses a local deterministic generator
+   - No external API keys are needed or embedded
+   - All card generation happens in the browser
 
 ### Recent Improvements (Latest Update)
 
@@ -234,13 +237,14 @@ This uses `gh-pages` package to build and push to the `gh-pages` branch.
 ## 📝 Notes for Maintainers
 
 ### Environment Variables
-- `API_KEY`: Google Gemini API key (optional, can be provided via UI)
+- No environment variables required for card generation
+- GitHub tokens can be provided via UI (optional)
 - Stored in localStorage by the app for user convenience
 - No sensitive data persisted server-side
 
 ### API Rate Limits
 - **GitHub API**: 60 requests/hour (unauthenticated), 5000/hour (with token)
-- **Gemini AI**: Depends on API key tier
+- **Local Generator**: No rate limits - runs entirely in browser
 - App handles rate limit errors gracefully with user feedback
 
 ### Browser Compatibility

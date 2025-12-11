@@ -12,8 +12,8 @@ Visit the live app: [https://bmsrk.github.io/SuperTrunfoGithub/](https://bmsrk.g
 
 ## ✨ Features
 
-- 🎨 **AI-Powered Character Art**: Generate unique character illustrations based on GitHub profiles using Gemini 2.5 Flash Image
-- 🧠 **Intelligent Personalization**: Advanced AI prompts analyze profile data to create truly unique cards:
+- 🎲 **Deterministic Local Generator**: Creates unique cards based on your GitHub profile using a local algorithm - no external API required!
+- 🧠 **Intelligent Personalization**: Advanced logic analyzes profile data to create truly unique cards:
   - Personality inference from bio, activity patterns, and coding style
   - Cultural context from location (e.g., "Capoeirista do React" for Brazilian developers)
   - Tech-specific archetypes based on primary languages and topics
@@ -23,13 +23,13 @@ Visit the live app: [https://bmsrk.github.io/SuperTrunfoGithub/](https://bmsrk.g
   - Automatic calculation from GitHub activity
   - Intelligent commit estimation based on account age, repositories, and engagement
   - Dynamic trump attribute selection based on strongest stat
+  - Deterministic results - same profile always generates the same card
 - 🎮 **Super Trunfo Game Mechanics**: Complete with special abilities and trump attributes
 - 💾 **High-Quality Downloads**: Export cards as 3x resolution PNG images
-- 🔐 **Flexible API Configuration**: 
+- 🔐 **Privacy First**: 
+  - No external API keys required or embedded
   - Optional GitHub token for higher API rate limits (5000/hour vs 60/hour)
-  - Default Gemini API key included (IP-restricted for GitHub Pages)
-  - Bring your own Gemini API key for unlimited generation
-- 🎯 **Fallback System**: Graceful degradation if AI services are unavailable
+  - All data processing happens locally in your browser
 
 ## 🛠️ Run Locally
 
@@ -46,18 +46,12 @@ Visit the live app: [https://bmsrk.github.io/SuperTrunfoGithub/](https://bmsrk.g
    npm install
    ```
 
-3. (Optional) Create a `.env.local` file and add your Gemini API key:
-   ```
-   API_KEY=your_gemini_api_key_here
-   ```
-   Note: The app can work without this, but you may hit rate limits.
-
-4. Run the development server:
+3. Run the development server:
    ```bash
    npm run dev
    ```
 
-5. Open your browser to `http://localhost:5173`
+4. Open your browser to `http://localhost:5173`
 
 ## 📦 Build for Production
 
@@ -115,54 +109,61 @@ npm run deploy
 
 This will build the project and push it to the `gh-pages` branch.
 
-## 🧠 How AI Personalization Works
+## 🧠 How the Local Generator Works
 
-DevTrunfo uses advanced prompt engineering to create truly unique cards for each developer:
+DevTrunfo uses a deterministic algorithm to create unique and consistent cards for each developer:
 
 ### Profile Analysis
-The AI analyzes multiple aspects of your GitHub profile:
+The generator analyzes multiple aspects of your GitHub profile:
 - **Coding Style**: Primary languages, repository topics, and project types
 - **Personality Traits**: Inferred from bio, activity patterns, and engagement metrics
 - **Cultural Context**: Location influences archetype names and descriptions
 - **Professional Context**: Company affiliation, open-source activity, hiring status
 - **Technical Focus**: Special abilities based on tech stack (e.g., ML, frontend, systems)
 
-### Contextual Card Generation
+### Deterministic Generation
+
+**Fingerprinting**: A unique fingerprint is created from your profile data:
+- Username + repository metrics + top languages + topics
+- This fingerprint is hashed using djb2 to create a seed
+- The seed feeds a Mulberry32 PRNG for deterministic randomness
+- Same profile always generates the same card!
 
 **Archetype Creation**: Instead of generic titles, archetypes are personalized:
-- A Brazilian React developer might become a "Capoeirista do React"
-- A data scientist with Python expertise becomes a "Bruxo de IA" (AI Wizard)
-- A prolific full-stack developer becomes "Polímata Full-Stack"
+- A Brazilian React developer might become a "Frontend Alchemist"
+- A data scientist with Python expertise becomes a "Data Sorcerer"
+- A prolific full-stack developer becomes "Script Wizard"
+- Weighted random selection based on languages, topics, and activity
 
 **Description Personalization**: References actual bio content, location, or inferred traits:
-- "De São Paulo, cria projetos como respira" (From São Paulo, creates projects like breathing)
 - Incorporates actual bio snippets when available
-- Adapts tone based on profile completeness and activity level
+- Mentions location, follower count, star count
+- References repository topics and specializations
+- Adapts based on profile completeness and activity level
 
 **Special Abilities**: Matched to technical expertise:
-- Python/Data developers: "DataFrame Overflow", "Neural Net Deploy"
-- React/Frontend developers: "Virtual DOM Mastery", "Component Tree Fury"
+- Python/Data developers: "Neural Net Deploy", "DataFrame Overflow"
+- React/Frontend developers: "Virtual DOM Storm"
 - Popular projects: "Open Source Legend", "Community Magnet"
-- Enterprise developers: "Enterprise Architect", "Scrum Sprint Lord"
-
-**Character Art**: Visual elements adapt to context:
-- Cultural motifs based on location
-- Tech stack visual hints (serpentine for Python, gears for Rust)
-- Art style variety with 10+ different aesthetics
-- Dynamic composition based on personality inference
+- Enterprise developers: "Enterprise Power"
 
 ### Smart Statistics
 - **Commit Estimation**: Formula considers repos, account age, stars, and original content
-- **Trump Selection**: Automatically picks the most impressive stat
-- **Balanced Stats**: Ensures fair gameplay while reflecting actual achievements
+- **Normalization**: Stats normalized to 1-100 range using logarithmic scaling
+- **Trump Selection**: Automatically picks the highest normalized stat (with small random chance)
+- **Deterministic**: Same inputs always produce the same outputs
 
 ## 🔧 Configuration
 
 - **GitHub Pages Base Path**: Set in `vite.config.ts` - currently configured for `/SuperTrunfoGithub/`
-- **API Keys**: 
-  - A default Gemini API key is included (IP-restricted to GitHub Pages)
-  - Users can provide their own keys through the UI settings for unlimited usage
-  - GitHub tokens are optional but recommended to avoid rate limits (60/hour → 5000/hour)
+- **GitHub Token (Optional)**: 
+  - Can be provided through the UI settings
+  - Increases GitHub API rate limits from 60/hour to 5000/hour
+  - Stored locally in browser localStorage
+- **No External API Keys**: 
+  - The app uses a local deterministic generator by default
+  - No external AI services are required or called
+  - All card generation happens in your browser
 
 ## 📝 License
 
