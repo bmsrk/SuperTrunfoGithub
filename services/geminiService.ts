@@ -1,11 +1,19 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { GithubUser, CardData } from '../types';
-import { getApiKey } from '../utils/apiKey';
+import { getApiKey } from '../utils/config';
 
 // Fallback function to generate basic card data without AI
 export const generateBasicCardData = (
   user: GithubUser,
-  repoSummary: { topLanguages: string[], totalStars: number, totalForks: number }
+  repoSummary: { 
+    topLanguages: string[], 
+    totalStars: number, 
+    totalForks: number,
+    allTopics: string[],
+    repoNames: string[],
+    repoDescriptions: string[],
+    originalRepoCount: number
+  }
 ): CardData => {
   const accountAge = new Date().getFullYear() - new Date(user.created_at).getFullYear();
   const estimatedCommits = user.public_repos * 50 + accountAge * 300;
@@ -125,43 +133,110 @@ const extractImageFromResponse = (response: any): string | null => {
 
 export const generateCardStats = async (
   user: GithubUser,
-  repoSummary: { topLanguages: string[], totalStars: number, totalForks: number },
+  repoSummary: { 
+    topLanguages: string[], 
+    totalStars: number, 
+    totalForks: number,
+    allTopics: string[],
+    repoNames: string[],
+    repoDescriptions: string[],
+    originalRepoCount: number
+  },
   apiKey?: string
 ): Promise<CardData> => {
   const ai = getAi(apiKey);
   
+  // Extract insights from user profile
+  const accountAge = new Date().getFullYear() - new Date(user.created_at).getFullYear();
+  const hasStrongBio = user.bio && user.bio.length > 20;
+  const isPopular = user.followers > 50;
+  const isProlific = user.public_repos > 20;
+  const isActiveContributor = repoSummary.totalStars > 100 || repoSummary.totalForks > 20;
+  
+  // Build a rich context string with assumptions
+  const contextualInsights = [];
+  
+  if (user.location) contextualInsights.push(`Localização: ${user.location}`);
+  if (user.company) contextualInsights.push(`Empresa/Organização: ${user.company}`);
+  if (user.twitter_username) contextualInsights.push(`Ativo em redes sociais (@${user.twitter_username})`);
+  if (user.blog) contextualInsights.push(`Mantém blog/site: ${user.blog}`);
+  if (user.hireable) contextualInsights.push(`Aberto a oportunidades`);
+  
+  if (repoSummary.allTopics.length > 0) {
+    contextualInsights.push(`Interesses/Tópicos: ${repoSummary.allTopics.slice(0, 5).join(', ')}`);
+  }
+  
+  if (repoSummary.repoNames.length > 0) {
+    contextualInsights.push(`Projetos notáveis: ${repoSummary.repoNames.join(', ')}`);
+  }
+  
+  if (repoSummary.repoDescriptions.length > 0) {
+    contextualInsights.push(`Descrições de projetos: "${repoSummary.repoDescriptions.join('"; "')}"`);
+  }
+  
   const prompt = `
-    Aja como um gerador de cartas para o jogo "Super Trunfo" edição Desenvolvedores.
-    Analise o perfil GitHub abaixo e gere os dados da carta.
+    Aja como um gerador CRIATIVO de cartas para o jogo "Super Trunfo" edição Desenvolvedores.
+    Analise profundamente o perfil GitHub abaixo e FAÇA SUPOSIÇÕES OUSADAS sobre a personalidade e estilo do desenvolvedor.
+    Seja ESPECÍFICO e evite clichês genéricos. Use o contexto completo para criar uma carta ÚNICA.
 
     Perfil do Usuário:
     - Username: ${user.login}
-    - Bio: ${user.bio || 'Sem bio'}
-    - Public Repos: ${user.public_repos}
-    - Followers: ${user.followers}
-    - Created At: ${user.created_at}
+    - Nome: ${user.name || 'Não informado'}
+    - Bio: ${user.bio || 'Sem bio (desenvolve em silêncio, deixa o código falar)'}
+    - Repositórios Públicos: ${user.public_repos} (${repoSummary.originalRepoCount} originais, ${user.public_repos - repoSummary.originalRepoCount} forks)
+    - Seguidores: ${user.followers}
+    - Seguindo: ${user.following}
+    - Conta criada em: ${user.created_at} (${accountAge} anos de experiência no GitHub)
+    ${contextualInsights.length > 0 ? '\nContexto Adicional:\n' + contextualInsights.map(i => `- ${i}`).join('\n') : ''}
     
-    Atividade de Código (Amostra):
-    - Top Linguagens: ${repoSummary.topLanguages.join(', ')}
+    Atividade de Código:
+    - Linguagens Principais: ${repoSummary.topLanguages.join(', ') || 'Polímata de múltiplas tecnologias'}
     - Total Estrelas: ${repoSummary.totalStars}
     - Total Forks: ${repoSummary.totalForks}
 
+    ANÁLISE DE PERSONALIDADE (Use isto para criar o archetype e description):
+    ${hasStrongBio ? '- Perfil bem documentado, provavelmente comunicativo e atento a detalhes' : '- Perfil minimalista, deixa o código falar por si'}
+    ${isPopular ? '- Reconhecido pela comunidade, líder de opinião' : '- Foca no trabalho, não na fama'}
+    ${isProlific ? '- Extremamente produtivo, provavelmente trabalha em múltiplos projetos' : '- Foca em qualidade sobre quantidade'}
+    ${isActiveContributor ? '- Projetos com alto engajamento, código que inspira outros' : '- Desenvolvedor independente ou em projetos privados'}
+    ${user.company ? `- Trabalha em ${user.company}, traz experiência corporativa` : '- Desenvolvedor independente ou freelancer'}
+    ${user.location ? `- Baseado em ${user.location}, pode ter influências culturais locais` : ''}
+
     REQUISITOS OBRIGATÓRIOS DE SAÍDA (JSON):
 
-    1. 'archetype': Uma classe de RPG criativa baseada nas linguagens (ex: "Pyromancer de Dados" para Python, "Paladino do Typescript", "Ladino do Backend").
-    2. 'description': Uma frase de efeito curta e engraçada sobre o perfil.
+    1. 'archetype': Crie uma classe de RPG ÚNICA e ESPECÍFICA. NÃO use termos genéricos.
+       - Combine a linguagem principal com personalidade inferida e contexto geográfico/cultural
+       - Exemplos: "${user.location?.includes('Brasil') ? 'Capoeirista do React' : 'Samurai do TypeScript'}", "Alquimista ${repoSummary.allTopics[0] || 'de Código'}", "${user.company ? 'Arquiteto Corporativo' : 'Hacker Nômade'} de ${repoSummary.topLanguages[0] || 'Multi-Stack'}"
+       - Se o usuário tem repos sobre ML/AI/Data, use termos como "Cientista de Dados", "Bruxo de IA", etc.
+       - Se é full-stack (múltiplas linguagens), destaque isso: "Polímata Full-Stack", "Mestre dos Mil Frameworks"
+    
+    2. 'description': Uma frase de efeito PERSONALIZADA que referencia:
+       - Bio do usuário (se existir e for relevante)
+       - Localização ou empresa (se disponível)
+       - Tópicos ou nomes de projetos específicos
+       - Personalidade inferida
+       Exemplo: "${user.bio?.substring(0, 50)}..." ou "De ${user.location || 'algum lugar do mundo'}, ${isProlific ? 'cria projetos como respira' : 'aperfeiçoa cada linha de código'}."
+    
     3. 'stats': Array com exatamente 4 atributos OBRIGATÓRIOS.
        - Use estes nomes exatos: 'Repositórios', 'Estrelas', 'Seguidores', 'Commits'.
        - Valores: 
          * Use os números reais para Repositórios, Estrelas, Seguidores.
-         * Para 'Commits', estime um número baseado na atividade (ex: public_repos * 50 + anos de conta * 300).
-         * Importante: Ajuste os valores para que o jogo seja jogável (nem todos devem ser baixos ou máximos).
+         * Para 'Commits', estime: (public_repos * 60 + anos * 400 + totalStars * 2 + originalRepoCount * 30).
+    
     4. 'superTrunfoAttribute': Escolha o atributo numérico mais impressionante para ser o trunfo.
+    
     5. 'specialAbility': Um objeto com 'name' e 'description'.
-       - O nome deve ser um comando Git ou termo de dev (ex: "Git Reset", "Force Push", "Merge Conflict", "Sudo Make Me a Sandwich").
-       - A descrição deve explicar o efeito no jogo de cartas (ex: "Troca o valor de Estrelas com o oponente", "Anula o trunfo do oponente", "Vence automaticamente se o atributo for Commits").
-    6. 'id': Gere um código como "DEV-XX" onde XX é um número aleatório.
+       - O NOME deve ser ESPECÍFICO ao perfil: 
+         * Se usa Python/Data: "DataFrame Overflow", "Neural Net Deploy"
+         * Se usa React/Frontend: "Virtual DOM Mastery", "Component Tree Fury"
+         * Se tem muitas estrelas: "Open Source Legend", "Community Magnet"
+         * Se de empresa grande: "Enterprise Architect", "Scrum Sprint Lord"
+         * Se localização específica: incorpore referências culturais sutis
+       - A descrição deve ser criativa e relevante ao jogo.
+    
+    6. 'id': Gere um código como "DEV-XX" onde XX é um número entre 01-99.
 
+    IMPORTANTE: Faça a carta DIFERENTE de outras. Use TODOS os detalhes disponíveis. Seja OUSADO nas suposições sobre personalidade.
     Responda APENAS com o JSON válido seguindo o schema.
   `;
 
@@ -214,6 +289,8 @@ export const generateCharacterImage = async (
     imageData: { base64: string; mimeType: string } | null, 
     archetype: string, 
     primaryLang: string,
+    user: GithubUser,
+    topics: string[],
     apiKey?: string,
     avatarUrl?: string
 ): Promise<string> => {
@@ -224,13 +301,61 @@ export const generateCharacterImage = async (
     const randomEnv = ENVIRONMENTS[Math.floor(Math.random() * ENVIRONMENTS.length)];
     const randomElement = POWER_ELEMENTS[Math.floor(Math.random() * POWER_ELEMENTS.length)];
 
+    // Build contextual details for more personalized imagery
+    const contextDetails = [];
+    
+    // Location-based visual cues
+    if (user.location) {
+        const loc = user.location.toLowerCase();
+        if (loc.includes('japan') || loc.includes('tokyo')) {
+            contextDetails.push('with subtle Japanese aesthetic elements');
+        } else if (loc.includes('brazil') || loc.includes('brasil')) {
+            contextDetails.push('with vibrant Brazilian color influences');
+        } else if (loc.includes('india')) {
+            contextDetails.push('with rich, colorful Indian-inspired patterns');
+        } else if (loc.includes('europe') || loc.includes('london') || loc.includes('berlin')) {
+            contextDetails.push('with European architectural elements in background');
+        }
+    }
+    
+    // Tech stack visual hints
+    if (primaryLang) {
+        const lang = primaryLang.toLowerCase();
+        if (lang.includes('python')) {
+            contextDetails.push('with serpentine or data visualization motifs');
+        } else if (lang.includes('rust')) {
+            contextDetails.push('with metallic, gear-based elements');
+        } else if (lang.includes('go')) {
+            contextDetails.push('with minimalist, clean design elements');
+        } else if (lang.includes('javascript') || lang.includes('typescript')) {
+            contextDetails.push('with dynamic, flowing script patterns');
+        }
+    }
+    
+    // Interest-based details from topics
+    if (topics.length > 0) {
+        const topicStr = topics.join(' ').toLowerCase();
+        if (topicStr.includes('machine-learning') || topicStr.includes('ai') || topicStr.includes('neural')) {
+            contextDetails.push('surrounded by neural network visualizations');
+        } else if (topicStr.includes('game') || topicStr.includes('unity')) {
+            contextDetails.push('with gaming aesthetic elements');
+        } else if (topicStr.includes('blockchain') || topicStr.includes('crypto')) {
+            contextDetails.push('with blockchain/cryptographic visual elements');
+        } else if (topicStr.includes('security') || topicStr.includes('cybersecurity')) {
+            contextDetails.push('with hacker/security themed elements');
+        }
+    }
+
     // Construct a rich, dynamic prompt
     const basePrompt = `
         Character Class: ${archetype}
         Primary Coding Language/Theme: ${primaryLang}
+        ${user.bio ? `Personality Hint: ${user.bio.substring(0, 100)}` : ''}
+        ${user.location ? `Cultural Context: ${user.location}` : ''}
         Art Style: ${randomStyle}
         Setting: ${randomEnv}
         Key Visual Detail: ${randomElement}
+        ${contextDetails.length > 0 ? 'Additional Context: ' + contextDetails.join(', ') : ''}
     `;
 
     try {

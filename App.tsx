@@ -17,6 +17,11 @@ const MOCK_PROFILE: CombinedProfile = {
     following: 0,
     created_at: "2010-01-01T00:00:00Z",
     html_url: "https://github.com",
+    location: "Silicon Valley",
+    company: "Test Corp",
+    twitter_username: "mockdev",
+    blog: "https://mockdev.example.com",
+    hireable: true,
   },
   cardData: {
     id: "DEV-00",
