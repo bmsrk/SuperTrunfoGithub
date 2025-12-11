@@ -87,56 +87,87 @@ describe('geminiService', () => {
       
       const result = generateLocalCardStats(jsUser, jsRepoSummary);
       // With weighted random selection, archetype should be one of the JavaScript options
-      const validArchetypes = ['Frontend Alchemist', 'Script Sorcerer', 'Web Enchanter'];
+      const validArchetypes = [
+        'Async Sorcerer', 'Promise Whisperer', 'Event Loop Maestro', 
+        'Callback Conjurer', 'DOM Manipulator Supreme', 'ES6 Archmage', 
+        'Node.js Necromancer'
+      ];
       expect(validArchetypes).toContain(result.archetype);
     });
 
     it('should handle TypeScript developers', () => {
       const tsRepoSummary = { ...mockRepoSummary, topLanguages: ['TypeScript'] };
       const result = generateLocalCardStats(mockUser, tsRepoSummary);
-      const validArchetypes = ['Type-Safe Paladin', 'Interface Guardian', 'Typed Warrior'];
+      const validArchetypes = [
+        'Type Enforcer', 'Generic Overlord', 'Interface Sculptor', 
+        'Compiler Tamer', 'Strict Mode Champion', 'Decorator Virtuoso',
+        'Angular Guardian'
+      ];
       expect(validArchetypes).toContain(result.archetype);
     });
 
     it('should handle Python developers', () => {
       const pyRepoSummary = { ...mockRepoSummary, topLanguages: ['Python'] };
       const result = generateLocalCardStats(mockUser, pyRepoSummary);
-      const validArchetypes = ['Data Sorcerer', 'Script Wizard', 'Algorithm Sage'];
+      const validArchetypes = [
+        'Pythonic Sage', 'List Comprehension Master', 'Pandas Wrangler', 
+        'Decorator Enchanter', 'Django Dynamo', 'Flask Alchemist', 
+        'Data Pipeline Architect', 'Snake Charmer'
+      ];
       expect(validArchetypes).toContain(result.archetype);
     });
 
     it('should handle Java developers', () => {
       const javaRepoSummary = { ...mockRepoSummary, topLanguages: ['Java'] };
       const result = generateLocalCardStats(mockUser, javaRepoSummary);
-      const validArchetypes = ['Enterprise Architect', 'JVM Titan', 'Bean Master'];
+      const validArchetypes = [
+        'Spring Framework Oracle', 'Thread Pool Tactician', 'Maven Magister', 
+        'Garbage Collection Guru', 'Exception Handler Extraordinaire', 
+        'Annotation Architect', 'Bytecode Blacksmith'
+      ];
       expect(validArchetypes).toContain(result.archetype);
     });
 
     it('should handle Go developers', () => {
       const goRepoSummary = { ...mockRepoSummary, topLanguages: ['Go'] };
       const result = generateLocalCardStats(mockUser, goRepoSummary);
-      const validArchetypes = ['Concurrency Master', 'Goroutine Shepherd', 'Cloud Native'];
+      const validArchetypes = [
+        'Channel Conductor', 'Goroutine Grandmaster', 'Concurrency Crusader', 
+        'Interface Implementor', 'Gopher Commander', 'Microservice Maverick',
+        'Error Handler Elite'
+      ];
       expect(validArchetypes).toContain(result.archetype);
     });
 
     it('should handle Rust developers', () => {
       const rustRepoSummary = { ...mockRepoSummary, topLanguages: ['Rust'] };
       const result = generateLocalCardStats(mockUser, rustRepoSummary);
-      const validArchetypes = ['Memory Guardian', 'Safe Code Sentinel', 'Systems Artisan'];
+      const validArchetypes = [
+        'Borrow Checker Whisperer', 'Memory Safety Sentinel', 'Lifetime Legend', 
+        'Ownership Oracle', 'Zero-Cost Zealot', 'Cargo Cultist',
+        'Systems Programming Samurai'
+      ];
       expect(validArchetypes).toContain(result.archetype);
     });
 
     it('should handle Kotlin developers with valid archetype', () => {
       const kotlinRepoSummary = { ...mockRepoSummary, topLanguages: ['Kotlin'] };
       const result = generateLocalCardStats(mockUser, kotlinRepoSummary);
-      const validArchetypes = ['Android Artisan', 'Coroutine Commander', 'JetBrains Virtuoso'];
+      const validArchetypes = [
+        'Coroutine Conjurer', 'Extension Function Expert', 'Sealed Class Specialist', 
+        'Data Class Dynamo', 'Jetpack Compose Composer', 'Android Authority',
+        'Null-Safety Knight'
+      ];
       expect(validArchetypes).toContain(result.archetype);
     });
 
     it('should handle empty language list with generic archetype', () => {
       const emptyRepoSummary = { ...mockRepoSummary, topLanguages: [] };
       const result = generateLocalCardStats(mockUser, emptyRepoSummary);
-      const validArchetypes = ['Code Developer', 'Code Expert', 'Code Master'];
+      const validArchetypes = [
+        'Code Code Craftsman', 'Code Digital Architect', 'Code Syntax Sorcerer',
+        'Code Framework Fanatic', 'Code Pattern Practitioner'
+      ];
       expect(validArchetypes).toContain(result.archetype);
     });
 
