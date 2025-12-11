@@ -65,7 +65,7 @@ export const InputForm: React.FC<InputFormProps> = memo(({ onSubmit, onMock, isL
         <div className="flex items-start gap-2">
           <Sparkles size={16} className="text-purple-400 flex-shrink-0 mt-0.5" />
           <div className="text-xs text-purple-200">
-            <p className="font-semibold mb-1">✨ AI-Powered Features</p>
+            <p className="font-semibold mb-1">AI-Powered Features</p>
             <p className="text-purple-300/90">
               This app uses Google Gemini AI to generate unique character art and card stats. 
               The default API key has limited quota. For unlimited usage, add your own Gemini API key in settings.

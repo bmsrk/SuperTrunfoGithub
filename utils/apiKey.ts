@@ -1,6 +1,12 @@
 /**
  * Obfuscated Google API Key utility
  * This key is restricted to GitHub Pages IP addresses only
+ * 
+ * Security Note: The obfuscation is intentionally simple (string reversal)
+ * because the API key is IP-restricted on Google Cloud Console to only work
+ * from GitHub Pages. This provides a reasonable level of security while allowing
+ * the key to be included in the public source code. The key cannot be used from
+ * other domains or IPs, making complex obfuscation unnecessary.
  */
 
 // Simple obfuscation - each chunk is reversed
