@@ -1,5 +1,6 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { GithubUser, CardData } from '../types';
+import { getApiKey } from '../utils/apiKey';
 
 // Fallback function to generate basic card data without AI
 export const generateBasicCardData = (
@@ -102,8 +103,12 @@ const POWER_ELEMENTS = [
 ];
 
 const getAi = (apiKey?: string) => {
-    if (!apiKey) throw new Error("API Key not found. Please add your Google API Key in settings.");
-    return new GoogleGenAI({ apiKey: apiKey });
+    try {
+        const key = getApiKey(apiKey);
+        return new GoogleGenAI({ apiKey: key });
+    } catch (error) {
+        throw new Error("Failed to initialize AI service. If the default API quota is exceeded, please add your own Gemini API key in settings.");
+    }
 };
 
 const extractImageFromResponse = (response: any): string | null => {

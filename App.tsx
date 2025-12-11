@@ -76,10 +76,18 @@ const App: React.FC = () => {
       <div className="relative z-10 w-full max-w-4xl flex flex-col items-center gap-12">
         
         {/* Input Section - Hide when result is shown */}
-        {!profile && (
-            <div className={`transition-all duration-500 ease-in-out w-full flex justify-center`}>
-                <InputForm onSubmit={generateCard} onMock={handleMock} isLoading={loading} />
-            </div>
+        {!profile && !loading && (
+            <>
+                <div className={`transition-all duration-500 ease-in-out w-full flex justify-center`}>
+                    <InputForm onSubmit={generateCard} onMock={handleMock} isLoading={loading} />
+                </div>
+                <p className="text-zinc-500 text-xs font-mono mt-8 text-center">
+                   <span className="text-zinc-600">made with love by </span>
+                   <a href="https://x.com/enrichthesoil" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 transition-colors">
+                     @enrichthesoil
+                   </a>
+                </p>
+            </>
         )}
 
         {/* Error Message */}
@@ -127,8 +135,12 @@ const App: React.FC = () => {
                     </button>
                 </div>
                 
-                <p className="text-zinc-500 text-xs font-mono mt-4">
-                   Generated with Gemini 2.5 • Developed by DevTrunfo
+                <p className="text-zinc-500 text-xs font-mono mt-4 text-center">
+                   Generated with Gemini 2.5 • Developed by DevTrunfo<br/>
+                   <span className="text-zinc-600">made with love by </span>
+                   <a href="https://x.com/enrichthesoil" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 transition-colors">
+                     @enrichthesoil
+                   </a>
                 </p>
             </div>
         )}

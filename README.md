@@ -6,6 +6,18 @@
 
 Generate custom Super Trunfo trading cards based on GitHub profiles using Gemini AI analysis.
 
+## 📸 Screenshots
+
+<div align="center">
+
+### Home Page with AI Features Info
+<img width="600" alt="Homepage" src="https://github.com/user-attachments/assets/926fa662-efa5-4183-adea-ca90702f92cc" />
+
+### Generated Card Example
+<img width="600" alt="Card Display" src="https://github.com/user-attachments/assets/87a0ad5d-032d-4b91-8608-f33192b897a0" />
+
+</div>
+
 ## 🚀 Live Demo
 
 Visit the live app: [https://bmsrk.github.io/SuperTrunfoGithub/](https://bmsrk.github.io/SuperTrunfoGithub/)
@@ -18,6 +30,8 @@ Visit the live app: [https://bmsrk.github.io/SuperTrunfoGithub/](https://bmsrk.g
 - 💾 Download cards as high-quality images
 - 🔐 Optional GitHub token for higher API rate limits
 - 🤖 Powered by Google Gemini AI
+- ⚡ Default API key included (IP-restricted for GitHub Pages)
+- 🎭 Bring your own API key for unlimited generation
 
 ## 🛠️ Run Locally
 
@@ -103,8 +117,15 @@ This will build the project and push it to the `gh-pages` branch.
 ## 🔧 Configuration
 
 - **GitHub Pages Base Path**: Set in `vite.config.ts` - currently configured for `/SuperTrunfoGithub/`
-- **API Keys**: Can be provided via environment variables or through the UI settings
+- **API Keys**: 
+  - A default Gemini API key is included (IP-restricted to GitHub Pages)
+  - Users can provide their own keys through the UI settings for unlimited usage
+  - GitHub tokens are optional but recommended to avoid rate limits
 
 ## 📝 License
 
 MIT License - feel free to use this project for your own purposes!
+
+## 💙 Credits
+
+Made with love by [@enrichthesoil](https://x.com/enrichthesoil)
